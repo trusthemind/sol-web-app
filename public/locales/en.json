@@ -1,0 +1,325 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "moodTracker": "Mood Tracker",
+    "profile": "Profile",
+    "doctors": "Doctors"
+  },
+  "auth": {
+    "title": "MindTrack",
+    "subtitle": "Your personal mental health companion. Track your mood, connect with professionals, and build healthier habits.",
+    "welcomeBack": "Welcome Back",
+    "signInDescription": "Sign in to your account or create a new one",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "createPassword": "Create a password",
+    "enterFullName": "Enter your full name",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "createAccount": "Create Account",
+    "features": {
+      "moodTracking": {
+        "title": "Mood Tracking",
+        "description": "Track your daily emotions with our intuitive interface"
+      },
+      "professionalSupport": {
+        "title": "Professional Support",
+        "description": "Connect with licensed mental health professionals"
+      },
+      "securePrivate": {
+        "title": "Secure & Private",
+        "description": "Your data is encrypted and completely confidential"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, Sarah! Here's your mental health overview.",
+    "trackMood": "Track Mood",
+    "profile": "Profile",
+    "currentMood": "Current Mood",
+    "weeklyAverage": "Weekly Average",
+    "streak": "Streak",
+    "nextSession": "Next Session",
+    "great": "Great",
+    "fromYesterday": "+12% from yesterday",
+    "fromLastWeek": "+0.8 from last week",
+    "days": "days",
+    "keepItUp": "Keep it up!",
+    "tomorrow": "Tomorrow",
+    "drSmithAt": "Dr. Smith at 2:00 PM",
+    "moodEnergyTrends": "Mood & Energy Trends",
+    "emotionalPatterns": "Your emotional patterns over the past week",
+    "recentActivities": "Recent Activities",
+    "latestActivities": "Your latest mental health activities",
+    "weeklyGoals": "Weekly Goals",
+    "quickActions": "Quick Actions",
+    "findDoctor": "Find a Doctor",
+    "startMeditation": "Start Meditation",
+    "breathingExercise": "Breathing Exercise",
+    "upcomingSessions": "Upcoming Sessions",
+    "activities": {
+      "meditation": "Completed meditation session",
+      "mood": "Logged mood: Happy",
+      "breathing": "Completed breathing exercise",
+      "journal": "Journal entry added",
+      "hoursAgo": "hours ago",
+      "dayAgo": "day ago",
+      "daysAgo": "days ago"
+    },
+    "goals": {
+      "meditation": "Meditation",
+      "exercise": "Exercise",
+      "journaling": "Journaling",
+      "sleep": "Sleep 8hrs"
+    },
+    "appointments": {
+      "drSarah": "Dr. Sarah Smith",
+      "groupTherapy": "Group Therapy",
+      "tomorrowAt": "Tomorrow, 2:00 PM",
+      "fridayAt": "Friday, 10:00 AM"
+    }
+  },
+  "moodTracker": {
+    "title": "How are you feeling?",
+    "subtitle": "Select your current emotional state",
+    "showHistory": "Show History",
+    "hideHistory": "Hide History",
+    "recentEntries": "Recent Mood Entries",
+    "intensity": "Intensity",
+    "view": "View",
+    "continue": "Continue",
+    "back": "Back",
+    "saveEntry": "Save Entry",
+    "intensityQuestion": "How intense is this feeling? (1-10)",
+    "mild": "Mild",
+    "strong": "Strong",
+    "triggersQuestion": "What triggered this feeling?",
+    "addNote": "Add a note (optional)",
+    "notePlaceholder": "How are you feeling? What's on your mind?",
+    "recommendations": "Recommendations",
+    "affirmation": "Affirmation:",
+    "tryActivities": "Try these activities:",
+    "breathingExercise": "Breathing Exercise:",
+    "start": "Start",
+    "stop": "Stop",
+    "breatheIn": "Breathe in...",
+    "breatheOut": "Breathe out...",
+    "moods": {
+      "joyful": {
+        "name": "Joyful",
+        "description": "Feeling happy and energetic",
+        "affirmation": "I embrace the joy in my life and share it with others.",
+        "activities": [
+          "Go for a walk",
+          "Call a friend",
+          "Listen to upbeat music"
+        ]
+      },
+      "content": {
+        "name": "Content",
+        "description": "Peaceful and satisfied",
+        "affirmation": "I am at peace with myself and my surroundings.",
+        "activities": [
+          "Meditate",
+          "Read a book",
+          "Practice gratitude"
+        ]
+      },
+      "neutral": {
+        "name": "Neutral",
+        "description": "Neither good nor bad",
+        "affirmation": "I accept my current state and remain open to what comes next.",
+        "activities": [
+          "Mindfulness practice",
+          "Light stretching",
+          "Journal your thoughts"
+        ]
+      },
+      "anxious": {
+        "name": "Anxious",
+        "description": "Feeling worried or stressed",
+        "affirmation": "This feeling is temporary. I am safe and I can handle this moment.",
+        "activities": [
+          "Deep breathing",
+          "Progressive muscle relaxation",
+          "Grounding exercises"
+        ]
+      },
+      "sad": {
+        "name": "Sad",
+        "description": "Feeling down or melancholy",
+        "affirmation": "It's okay to feel sad. My emotions are valid and will pass with time.",
+        "activities": [
+          "Self-care activity",
+          "Gentle movement",
+          "Talk to someone you trust"
+        ]
+      },
+      "angry": {
+        "name": "Angry",
+        "description": "Feeling frustrated or mad",
+        "affirmation": "I acknowledge my anger and choose how to respond to it constructively.",
+        "activities": [
+          "Physical exercise",
+          "Write out your feelings",
+          "Count to ten"
+        ]
+      },
+      "excited": {
+        "name": "Excited",
+        "description": "Feeling enthusiastic and eager",
+        "affirmation": "I embrace this positive energy and direct it purposefully.",
+        "activities": [
+          "Channel energy into creativity",
+          "Share your excitement",
+          "Plan your next steps"
+        ]
+      },
+      "tired": {
+        "name": "Tired",
+        "description": "Feeling fatigued or exhausted",
+        "affirmation": "I honor my body's need for rest and recovery.",
+        "activities": [
+          "Take a short nap",
+          "Gentle stretching",
+          "Prioritize rest"
+        ]
+      }
+    },
+    "triggers": {
+      "work": "Work/School",
+      "relationships": "Relationships",
+      "health": "Health",
+      "finances": "Finances",
+      "socialMedia": "Social Media",
+      "news": "News",
+      "weather": "Weather",
+      "sleep": "Sleep Quality",
+      "exercise": "Exercise",
+      "food": "Food/Diet",
+      "family": "Family",
+      "friends": "Friends"
+    },
+    "history": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "days ago"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account and preferences",
+    "editProfile": "Edit Profile",
+    "saveChanges": "Save Changes",
+    "memberSince": "Member since March 2024",
+    "premium": "Premium",
+    "dayStreak": "12-day streak",
+    "yourProgress": "Your Progress",
+    "moodEntries": "Mood entries",
+    "sessionsCompleted": "Sessions completed",
+    "currentStreak": "Current streak",
+    "averageMood": "Average mood",
+    "personalInfo": "Personal Information",
+    "updateDetails": "Update your personal details",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself...",
+    "bioDefault": "I'm on a journey to better mental health and mindfulness. I enjoy meditation, reading, and spending time in nature.",
+    "preferences": "Preferences",
+    "customizeExperience": "Customize your app experience",
+    "pushNotifications": "Push Notifications",
+    "notificationsDesc": "Receive reminders and updates",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Use dark theme",
+    "reminderFrequency": "Reminder Frequency",
+    "daily": "Daily",
+    "twiceDaily": "Twice Daily",
+    "weekly": "Weekly",
+    "privacySecurity": "Privacy & Security",
+    "accountSecurity": "Manage your account security",
+    "changePassword": "Change Password",
+    "twoFactor": "Two-Factor Authentication",
+    "downloadData": "Download My Data",
+    "deleteAccount": "Delete Account"
+  },
+  "doctors": {
+    "title": "Find a Doctor",
+    "subtitle": "Connect with mental health professionals",
+    "searchPlaceholder": "Search doctors by name or specialty...",
+    "filters": "Filters",
+    "all": "All",
+    "experience": "experience",
+    "next": "Next:",
+    "call": "Call",
+    "message": "Message",
+    "bookAppointment": "Book Appointment",
+    "noResults": "No doctors found",
+    "tryAdjusting": "Try adjusting your search or filters",
+    "crisisSupport": "Crisis Support",
+    "crisisDesc": "If you're experiencing a mental health emergency, please reach out immediately",
+    "crisisHotline": "Crisis Hotline: 988",
+    "emergency": "Emergency: 911",
+    "availableToday": "Available Today",
+    "availableTomorrow": "Available Tomorrow",
+    "availableThisWeek": "Available This Week",
+    "availableNextWeek": "Available Next Week",
+    "specialties": {
+      "anxiety": "Anxiety",
+      "depression": "Depression",
+      "ptsd": "PTSD",
+      "bipolar": "Bipolar",
+      "adhd": "ADHD",
+      "trauma": "Trauma",
+      "cbt": "CBT",
+      "dbt": "DBT",
+      "mindfulness": "Mindfulness",
+      "couplesTherapy": "Couples Therapy",
+      "familyTherapy": "Family Therapy"
+    },
+    "doctorsList": {
+      "drSarah": {
+        "name": "Dr. Sarah Smith",
+        "specialty": "Clinical Psychologist"
+      },
+      "drMichael": {
+        "name": "Dr. Michael Chen",
+        "specialty": "Psychiatrist"
+      },
+      "drEmily": {
+        "name": "Dr. Emily Rodriguez",
+        "specialty": "Therapist"
+      },
+      "drJames": {
+        "name": "Dr. James Wilson",
+        "specialty": "Behavioral Therapist"
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

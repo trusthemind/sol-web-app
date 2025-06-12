@@ -5,6 +5,146 @@
     "profile": "Profile",
     "doctors": "Doctors"
   },
+  "landing": {
+    "hero": {
+      "title": "Your Mental Health Journey Starts Here",
+      "subtitle": "Track your mood, connect with professionals, and build healthier habits with our comprehensive mental health platform.",
+      "getStarted": "Get Started Free",
+      "watchDemo": "Watch Demo",
+      "appPreview": "MindTrack App Preview"
+    },
+    "stats": {
+      "users": "Active Users",
+      "satisfaction": "Satisfaction Rate",
+      "sessions": "Therapy Sessions",
+      "support": "Support Available"
+    },
+    "features": {
+      "title": "Everything You Need for Mental Wellness",
+      "subtitle": "Comprehensive tools and features designed to support your mental health journey every step of the way.",
+      "moodTracking": {
+        "title": "Smart Mood Tracking",
+        "description": "Track your emotions with our intuitive interface and gain insights into your mental health patterns."
+      },
+      "aiInsights": {
+        "title": "AI-Powered Insights",
+        "description": "Get personalized recommendations and insights based on your mood patterns and behaviors."
+      },
+      "professionalSupport": {
+        "title": "Professional Support",
+        "description": "Connect with licensed therapists and mental health professionals when you need expert guidance."
+      },
+      "privacy": {
+        "title": "Privacy & Security",
+        "description": "Your data is encrypted and secure. We prioritize your privacy and confidentiality above all else."
+      },
+      "scheduling": {
+        "title": "Easy Scheduling",
+        "description": "Book appointments with mental health professionals directly through our platform."
+      },
+      "progress": {
+        "title": "Progress Tracking",
+        "description": "Monitor your mental health journey with detailed analytics and progress reports."
+      }
+    },
+    "howItWorks": {
+      "title": "How MindTrack Works",
+      "subtitle": "Getting started with your mental health journey is simple and straightforward.",
+      "step1": {
+        "title": "Track Your Mood",
+        "description": "Log your daily emotions and feelings with our easy-to-use mood tracker."
+      },
+      "step2": {
+        "title": "Get Insights",
+        "description": "Receive personalized insights and recommendations based on your patterns."
+      },
+      "step3": {
+        "title": "Connect & Grow",
+        "description": "Connect with professionals and build healthier mental health habits."
+      }
+    },
+    "testimonials": {
+      "title": "What Our Users Say",
+      "subtitle": "Join thousands of users who have transformed their mental health journey with MindTrack.",
+      "sarah": {
+        "name": "Sarah Johnson",
+        "role": "Marketing Manager",
+        "content": "MindTrack has completely changed how I approach my mental health. The mood tracking feature helps me understand my patterns, and connecting with a therapist was seamless."
+      },
+      "michael": {
+        "name": "Michael Chen",
+        "role": "Software Developer",
+        "content": "As someone who struggles with anxiety, MindTrack's breathing exercises and professional support have been invaluable. I feel more in control of my mental health."
+      },
+      "emma": {
+        "name": "Emma Rodriguez",
+        "role": "Teacher",
+        "content": "The insights I get from tracking my mood have helped me identify triggers and develop better coping strategies. Highly recommend MindTrack to anyone."
+      }
+    },
+    "pricing": {
+      "title": "Choose Your Plan",
+      "subtitle": "Start your mental health journey with a plan that fits your needs and budget.",
+      "getStarted": "Get Started",
+      "startTrial": "Start Free Trial",
+      "contactSales": "Contact Sales",
+      "free": {
+        "title": "Free",
+        "price": "$0",
+        "description": "Perfect for getting started",
+        "feature1": "Basic mood tracking",
+        "feature2": "Weekly insights",
+        "feature3": "Community support",
+        "feature4": "Mobile app access"
+      },
+      "premium": {
+        "title": "Premium",
+        "price": "$9.99/mo",
+        "description": "Most popular choice",
+        "popular": "Most Popular",
+        "feature1": "Advanced mood analytics",
+        "feature2": "AI-powered insights",
+        "feature3": "Professional consultations",
+        "feature4": "Priority support",
+        "feature5": "Custom goal setting",
+        "feature6": "Export data reports"
+      },
+      "professional": {
+        "title": "Professional",
+        "price": "$29.99/mo",
+        "description": "For healthcare providers",
+        "feature1": "Everything in Premium",
+        "feature2": "Patient management tools",
+        "feature3": "Clinical dashboard",
+        "feature4": "HIPAA compliance",
+        "feature5": "Team collaboration",
+        "feature6": "Advanced reporting",
+        "feature7": "API access"
+      }
+    },
+    "cta": {
+      "title": "Ready to Transform Your Mental Health?",
+      "subtitle": "Join thousands of users who have already started their journey to better mental wellness with MindTrack.",
+      "getStarted": "Start Your Journey",
+      "learnMore": "Learn More"
+    },
+    "footer": {
+      "description": "Empowering individuals to take control of their mental health journey through technology and professional support.",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "security": "Security",
+      "company": "Company",
+      "about": "About Us",
+      "careers": "Careers",
+      "contact": "Contact",
+      "support": "Support",
+      "help": "Help Center",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "rights": "All rights reserved."
+    }
+  },
   "auth": {
     "title": "MindTrack",
     "subtitle": "Your personal mental health companion. Track your mood, connect with professionals, and build healthier habits.",
@@ -115,81 +255,49 @@
         "name": "Joyful",
         "description": "Feeling happy and energetic",
         "affirmation": "I embrace the joy in my life and share it with others.",
-        "activities": [
-          "Go for a walk",
-          "Call a friend",
-          "Listen to upbeat music"
-        ]
+        "activities": ["Go for a walk", "Call a friend", "Listen to upbeat music"]
       },
       "content": {
         "name": "Content",
         "description": "Peaceful and satisfied",
         "affirmation": "I am at peace with myself and my surroundings.",
-        "activities": [
-          "Meditate",
-          "Read a book",
-          "Practice gratitude"
-        ]
+        "activities": ["Meditate", "Read a book", "Practice gratitude"]
       },
       "neutral": {
         "name": "Neutral",
         "description": "Neither good nor bad",
         "affirmation": "I accept my current state and remain open to what comes next.",
-        "activities": [
-          "Mindfulness practice",
-          "Light stretching",
-          "Journal your thoughts"
-        ]
+        "activities": ["Mindfulness practice", "Light stretching", "Journal your thoughts"]
       },
       "anxious": {
         "name": "Anxious",
         "description": "Feeling worried or stressed",
         "affirmation": "This feeling is temporary. I am safe and I can handle this moment.",
-        "activities": [
-          "Deep breathing",
-          "Progressive muscle relaxation",
-          "Grounding exercises"
-        ]
+        "activities": ["Deep breathing", "Progressive muscle relaxation", "Grounding exercises"]
       },
       "sad": {
         "name": "Sad",
         "description": "Feeling down or melancholy",
         "affirmation": "It's okay to feel sad. My emotions are valid and will pass with time.",
-        "activities": [
-          "Self-care activity",
-          "Gentle movement",
-          "Talk to someone you trust"
-        ]
+        "activities": ["Self-care activity", "Gentle movement", "Talk to someone you trust"]
       },
       "angry": {
         "name": "Angry",
         "description": "Feeling frustrated or mad",
         "affirmation": "I acknowledge my anger and choose how to respond to it constructively.",
-        "activities": [
-          "Physical exercise",
-          "Write out your feelings",
-          "Count to ten"
-        ]
+        "activities": ["Physical exercise", "Write out your feelings", "Count to ten"]
       },
       "excited": {
         "name": "Excited",
         "description": "Feeling enthusiastic and eager",
         "affirmation": "I embrace this positive energy and direct it purposefully.",
-        "activities": [
-          "Channel energy into creativity",
-          "Share your excitement",
-          "Plan your next steps"
-        ]
+        "activities": ["Channel energy into creativity", "Share your excitement", "Plan your next steps"]
       },
       "tired": {
         "name": "Tired",
         "description": "Feeling fatigued or exhausted",
         "affirmation": "I honor my body's need for rest and recovery.",
-        "activities": [
-          "Take a short nap",
-          "Gentle stretching",
-          "Prioritize rest"
-        ]
+        "activities": ["Take a short nap", "Gentle stretching", "Prioritize rest"]
       }
     },
     "triggers": {

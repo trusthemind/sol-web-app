@@ -6,12 +6,37 @@ import { Toaster } from "@/components/ui/sonner";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { locales } from "@/lib/i18n";
 import { ThemeProvider } from "next-themes";
+import { DefaultLayout } from "@/src/components/DefaultLayout";
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MindTrack - Mental Health Companion",
-  description: "Track your mental health journey with personalized insights",
+  title: "Sol - Solution for Mental Health",
+  keywords: [
+    "mental health",
+    "wellness",
+    "mood tracking",
+    "mental wellness",
+    "self-care",
+    "therapy",
+    "mental health app",
+    "mood journal",
+    "mental health tracking",
+    "emotional well-being",
+    "mental health support",
+    "mental health solutions",
+    "mental health awareness",
+    "mental health resources",
+    "mental health community",
+    "mental health improvement",
+    "mental health management",
+    "mental health tools",
+    "mental health insights",
+    "mental health journey",
+  ],
+  description:
+    "Sol is a mental health app designed to help you track your mood, manage stress, and improve your overall well-being. With features like mood journaling, self-care tips, and community support, Sol is your companion for a healthier mind.",
 };
 
 export async function generateStaticParams() {
@@ -26,8 +51,7 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  console.log("Current locale:", locale);
-  
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning={true}>
@@ -37,10 +61,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="fixed top-4 right-4 z-50">
-            <LanguageSwitcher />
-          </div>
-          {children}
+          <DefaultLayout>{children}</DefaultLayout>
           <Toaster />
         </ThemeProvider>
       </body>

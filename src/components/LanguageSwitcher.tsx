@@ -124,7 +124,7 @@ export function LanguageSwitcher() {
                       ${
                         isActive
                           ? "bg-[#155DFC]/10 text-[#155DFC]"
-                          : "hover:bg-red text-gray-700"
+                          : "hover:white-red text-gray-700"
                       }
                       ${isChanging ? "opacity-50" : "opacity-100"}
                     `}

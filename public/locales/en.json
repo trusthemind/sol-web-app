@@ -146,10 +146,12 @@
     }
   },
   "auth": {
-    "title": "MindTrack",
+    "title": "Sol",
     "subtitle": "Your personal mental health companion. Track your mood, connect with professionals, and build healthier habits.",
     "welcomeBack": "Welcome Back",
+    "joinToday": "Join Sol today and take the first step towards better mental health.",
     "signInDescription": "Sign in to your account or create a new one",
+    "signUpDescription": "Create a new account to start your mental health journey",
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "email": "Email",
@@ -157,6 +159,7 @@
     "fullName": "Full Name",
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
+    "confirmPassword": "Confirm your password",
     "createPassword": "Create a password",
     "enterFullName": "Enter your full name",
     "signingIn": "Signing in...",
@@ -255,7 +258,11 @@
         "name": "Joyful",
         "description": "Feeling happy and energetic",
         "affirmation": "I embrace the joy in my life and share it with others.",
-        "activities": ["Go for a walk", "Call a friend", "Listen to upbeat music"]
+        "activities": [
+          "Go for a walk",
+          "Call a friend",
+          "Listen to upbeat music"
+        ]
       },
       "content": {
         "name": "Content",
@@ -267,37 +274,61 @@
         "name": "Neutral",
         "description": "Neither good nor bad",
         "affirmation": "I accept my current state and remain open to what comes next.",
-        "activities": ["Mindfulness practice", "Light stretching", "Journal your thoughts"]
+        "activities": [
+          "Mindfulness practice",
+          "Light stretching",
+          "Journal your thoughts"
+        ]
       },
       "anxious": {
         "name": "Anxious",
         "description": "Feeling worried or stressed",
         "affirmation": "This feeling is temporary. I am safe and I can handle this moment.",
-        "activities": ["Deep breathing", "Progressive muscle relaxation", "Grounding exercises"]
+        "activities": [
+          "Deep breathing",
+          "Progressive muscle relaxation",
+          "Grounding exercises"
+        ]
       },
       "sad": {
         "name": "Sad",
         "description": "Feeling down or melancholy",
         "affirmation": "It's okay to feel sad. My emotions are valid and will pass with time.",
-        "activities": ["Self-care activity", "Gentle movement", "Talk to someone you trust"]
+        "activities": [
+          "Self-care activity",
+          "Gentle movement",
+          "Talk to someone you trust"
+        ]
       },
       "angry": {
         "name": "Angry",
         "description": "Feeling frustrated or mad",
         "affirmation": "I acknowledge my anger and choose how to respond to it constructively.",
-        "activities": ["Physical exercise", "Write out your feelings", "Count to ten"]
+        "activities": [
+          "Physical exercise",
+          "Write out your feelings",
+          "Count to ten"
+        ]
       },
       "excited": {
         "name": "Excited",
         "description": "Feeling enthusiastic and eager",
         "affirmation": "I embrace this positive energy and direct it purposefully.",
-        "activities": ["Channel energy into creativity", "Share your excitement", "Plan your next steps"]
+        "activities": [
+          "Channel energy into creativity",
+          "Share your excitement",
+          "Plan your next steps"
+        ]
       },
       "tired": {
         "name": "Tired",
         "description": "Feeling fatigued or exhausted",
         "affirmation": "I honor my body's need for rest and recovery.",
-        "activities": ["Take a short nap", "Gentle stretching", "Prioritize rest"]
+        "activities": [
+          "Take a short nap",
+          "Gentle stretching",
+          "Prioritize rest"
+        ]
       }
     },
     "triggers": {
@@ -356,8 +387,8 @@
     "accountSecurity": "Manage your account security",
     "changePassword": "Change Password",
     "twoFactor": "Two-Factor Authentication",
-    "downloadData": "Download My Data",
-    "deleteAccount": "Delete Account"
+    "deleteAccount": "Delete Account",
+    "logout": "Log Out"
   },
   "doctors": {
     "title": "Find a Doctor",

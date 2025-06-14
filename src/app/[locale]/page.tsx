@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/src/shared/hooks/useTranslation";
 
 export default function HomePage() {
   const router = useRouter();

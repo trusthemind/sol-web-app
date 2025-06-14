@@ -44,7 +44,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/src/shared/hooks/useTranslation";
 
 export default function MoodTracker() {
   const { t, locale, isLoading } = useTranslation();
@@ -756,10 +756,10 @@ export default function MoodTracker() {
               </div>
             </div>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center gap-2 border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
+              className="flex items-center border-2 gap-2 border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
             >
               <Clock className="h-4 w-4" />
               {showHistory

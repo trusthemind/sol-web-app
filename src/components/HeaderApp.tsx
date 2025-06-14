@@ -13,26 +13,23 @@ import {
   Heart,
   Stethoscope,
   User,
-  Settings,
-  Home,
 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../shared/stores/context/AuthContext";
+import Image from "next/image";
 
-// Route enum
 enum AppRoutes {
   HOME = "/",
   AUTH = "/auth",
   DASHBOARD = "/dashboard",
-  SETTINGS = "/settings",
   PROFILE = "/profile",
   NOT_FOUND = "*",
   MOOD = "/mood",
   DOCTORS = "/doctors",
 }
 
-// Navigation item interface
 interface NavItem {
   route: AppRoutes;
   icon: React.ComponentType<{ className?: string }>;
@@ -63,7 +60,67 @@ const navigationItems: NavItem[] = [
   },
 ];
 
-// Memoized navigation item component to prevent re-renders
+// Avatar Component
+const UserAvatar = ({
+  avatar,
+  firstName,
+  lastName,
+  size = "md",
+}: {
+  avatar?: string;
+  firstName: string;
+  lastName: string;
+  size?: "sm" | "md" | "lg";
+}) => {
+  const getInitials = () => {
+    const firstInitial = firstName?.charAt(0)?.toUpperCase() || "";
+    const lastInitial = lastName?.charAt(0)?.toUpperCase() || "";
+    return `${firstInitial}${lastInitial}`;
+  };
+
+  const sizeClasses = {
+    sm: "h-8 w-8 text-sm",
+    md: "h-10 w-10 text-base",
+    lg: "h-12 w-12 text-lg",
+  };
+
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={`relative ${sizeClasses[size]} rounded-full overflow-hidden border-2 border-white shadow-lg shadow-blue-500/20 cursor-pointer`}
+    >
+      {avatar ? (
+        <Image
+          src={avatar}
+          width={50}
+          height={50}
+          alt={`${firstName} ${lastName}`}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = "none";
+            target.nextElementSibling?.classList.remove("hidden");
+          }}
+        />
+      ) : null}
+      <div
+        className={`${
+          avatar ? "hidden" : "flex"
+        } w-full h-full bg-gradient-to-br from-[#155DFC] to-blue-600 text-white items-center justify-center font-semibold`}
+      >
+        {getInitials()}
+      </div>
+      {/* Always render initials as fallback, hidden initially if avatar exists */}
+      {avatar && (
+        <div className="hidden w-full h-full bg-gradient-to-br from-[#155DFC] to-blue-600 text-white items-center justify-center font-semibold absolute inset-0">
+          {getInitials()}
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
 const NavigationItem = ({
   item,
   isActive,
@@ -134,40 +191,33 @@ const NavigationItem = ({
   );
 };
 
-export default function HeaderApp() {
+export const HeaderApp: React.FC = () => {
+  const { user } = useAuth();
+  const avatar = user?.avatar;
+  const lastName = user?.lastName ?? "";
+  const firstName = user?.firstName ?? "";
   const { t, locale } = useTranslation();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Hide navigation if pathname includes 'auth'
   const shouldHideNavigation = pathname.includes("/auth");
 
-  // Get current active route based on pathname
   const activeRoute = useMemo(() => {
-    // Remove locale prefix from pathname for matching
     const cleanPath = pathname.replace(`/${locale}`, "") || "/";
 
-    // Find matching route
     const matchedItem = navigationItems.find((item) => {
       if (
         item.route === AppRoutes.DASHBOARD &&
         (cleanPath === "/" || cleanPath === "/dashboard")
-      ) {
+      )
         return true;
-      }
-      return cleanPath.includes(item.route) && item.route !== "/";
+      else return cleanPath.includes(item.route) && item.route !== "/";
     });
-
-    // Check for settings route separately
-    if (cleanPath.includes("/settings")) {
-      return AppRoutes.SETTINGS;
-    }
 
     return matchedItem?.route || AppRoutes.DASHBOARD;
   }, [pathname, locale]);
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -176,7 +226,6 @@ export default function HeaderApp() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
@@ -188,7 +237,7 @@ export default function HeaderApp() {
     [locale]
   );
 
-  const handleNavigation = useCallback((route: AppRoutes) => {
+  const handleNavigation = useCallback((route: string) => {
     setIsMenuOpen(false);
   }, []);
 
@@ -201,7 +250,7 @@ export default function HeaderApp() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", damping: 20 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 mb-12 ${
         scrolled
           ? "bg-white/95 backdrop-blur-xl shadow-xl shadow-blue-500/5 border-b border-blue-100/20"
           : "bg-white/90 backdrop-blur-md"
@@ -260,44 +309,21 @@ export default function HeaderApp() {
             </motion.div>
           </div>
 
-          {/* Right Side Actions */}
           <div className="flex items-center space-x-4 ml-auto">
-            {/* Desktop Actions */}
             <div className="hidden lg:flex items-center space-x-4">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link
-                  href={getLocalizedPath(AppRoutes.SETTINGS)}
-                  className={`p-3 rounded-full transition-all duration-300 ${
-                    activeRoute === AppRoutes.SETTINGS
-                      ? "bg-gradient-to-r from-[#155DFC] to-blue-600 text-white shadow-lg shadow-blue-500/30"
-                      : "hover:bg-blue-50 text-gray-600 hover:text-[#155DFC]"
-                  }`}
-                >
-                  <Settings className="h-5 w-5" />
-                </Link>
-              </motion.div>
-
               <div className="h-8 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
 
               <LanguageSwitcher />
-
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-[#155DFC] to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full px-8 py-3 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 transition-all duration-300 font-semibold"
-                >
-                  {t("navigation.getStarted")}
-                </Button>
-              </motion.div>
+              <Link href={getLocalizedPath(AppRoutes.PROFILE)}>
+                <UserAvatar
+                  avatar={avatar}
+                  firstName={firstName}
+                  lastName={lastName}
+                  size="md"
+                />
+              </Link>
             </div>
 
-            {/* Mobile Menu Controls */}
             <div className="lg:hidden flex items-center space-x-3">
               <LanguageSwitcher />
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -359,7 +385,7 @@ export default function HeaderApp() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -50 }}
                     transition={{
-                      delay: index * 0.1,
+                      delay: (index + 1) * 0.1,
                       type: "spring",
                       stiffness: 100,
                     }}
@@ -374,57 +400,30 @@ export default function HeaderApp() {
                   </motion.div>
                 ))}
 
-                {/* Settings Link */}
                 <motion.div
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -50 }}
-                  transition={{
-                    delay: navigationItems.length * 0.1,
-                    type: "spring",
-                    stiffness: 100,
-                  }}
+                  transition={{ delay: 0, type: "spring", stiffness: 100 }}
+                  className="px-6 py-3 border-b border-blue-100/30"
                 >
                   <Link
-                    href={getLocalizedPath(AppRoutes.SETTINGS)}
-                    className={`flex items-center space-x-3 px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${
-                      activeRoute === AppRoutes.SETTINGS
-                        ? "bg-gradient-to-r from-[#155DFC] to-blue-600 text-white shadow-lg shadow-blue-500/20"
-                        : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-600"
-                    }`}
-                    onClick={() => handleNavigation(AppRoutes.SETTINGS)}
+                    href={getLocalizedPath(AppRoutes.PROFILE)}
+                    className="flex items-center space-x-3 p-2 rounded-xl hover:bg-blue-50 transition-all duration-300"
+                    onClick={() => handleNavigation(AppRoutes.PROFILE)}
                   >
-                    <Settings
-                      className={`h-5 w-5 transition-all duration-300 ${
-                        activeRoute === AppRoutes.SETTINGS
-                          ? "text-white"
-                          : "text-gray-500"
-                      }`}
+                    <UserAvatar
+                      avatar={avatar}
+                      firstName={firstName}
+                      lastName={lastName}
+                      size="lg"
                     />
-                    <span className="font-medium">
-                      {t("navigation.settings")}
-                    </span>
+                    <div>
+                      <div className="font-semibold text-gray-800">
+                        {firstName} {lastName}
+                      </div>
+                    </div>
                   </Link>
-                </motion.div>
-
-                {/* CTA Button */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{
-                    delay: (navigationItems.length + 1) * 0.1,
-                    type: "spring",
-                    stiffness: 100,
-                  }}
-                  className="px-6 pt-4 pb-2"
-                >
-                  <Button
-                    size="lg"
-                    className="w-full bg-gradient-to-r from-[#155DFC] to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full shadow-lg shadow-blue-500/30 font-semibold py-4"
-                  >
-                    {t("navigation.getStarted")}
-                  </Button>
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -433,4 +432,4 @@ export default function HeaderApp() {
       </div>
     </motion.nav>
   );
-}
+};

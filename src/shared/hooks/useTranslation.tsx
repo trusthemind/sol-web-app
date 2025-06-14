@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getTranslations } from "../lib/translation";
+import { getTranslations } from "../../lib/translation";
 import type { Locale } from "@/lib/i18n";
 
 type TranslationKeys = {

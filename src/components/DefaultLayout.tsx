@@ -1,13 +1,18 @@
 import React from "react";
-import HeaderApp from "./HeaderApp";
+import { Toaster } from "./ui/sonner";
+import { AuthProvider } from "../shared/stores/context/AuthContext";
+import { HeaderApp } from "./HeaderApp";
 
 export const DefaultLayout: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   return (
     <>
+      <AuthProvider>
       <HeaderApp />
-      {children}
+        <main>{children}</main>
+      </AuthProvider>
+      <Toaster position="top-right" expand={false} />
     </>
   );
 };

@@ -49,7 +49,8 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/src/shared/hooks/useTranslation";
+import { useAuth } from "@/src/shared/stores/context/AuthContext";
 
 const moodData = [
   { day: "Mon", mood: 7, energy: 6, stress: 4 },
@@ -92,6 +93,24 @@ export default function Dashboard() {
   const { t, locale, isLoading } = useTranslation();
   const [selectedPeriod, setSelectedPeriod] = useState("week");
   const [selectedMetric, setSelectedMetric] = useState("mood");
+  const { user } = useAuth();
+
+  // Localized day abbreviations
+  const localizedDayData = moodData.map((item) => ({
+    ...item,
+    day:
+      locale === "ua"
+        ? {
+            Mon: "Пн",
+            Tue: "Вт",
+            Wed: "Ср",
+            Thu: "Чт",
+            Fri: "Пт",
+            Sat: "Сб",
+            Sun: "Нд",
+          }[item.day] || item.day
+        : item.day,
+  }));
 
   const weeklyGoals = [
     {
@@ -158,6 +177,16 @@ export default function Dashboard() {
       bgColor: "bg-orange-50",
     },
   ];
+
+  // Localized metric labels
+  const getMetricLabel = (metric: string) => {
+    const labels = {
+      mood: locale === "ua" ? "Настрій" : "Mood",
+      energy: locale === "ua" ? "Енергія" : "Energy",
+      stress: locale === "ua" ? "Стрес" : "Stress",
+    };
+    return labels[metric as keyof typeof labels] || metric;
+  };
 
   if (isLoading) {
     return (
@@ -239,7 +268,6 @@ export default function Dashboard() {
 
       <div className="relative z-10 pt-24 pb-8">
         <div className="container mx-auto px-4 py-8">
-          {/* Enhanced Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -259,7 +287,13 @@ export default function Dashboard() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                Welcome back, Sarah! Let's check your progress today.
+                {locale === "ua"
+                  ? `З поверненням${
+                      user?.firstName ? `, ${user.firstName}` : ""
+                    }! Давайте перевіримо ваш прогрес сьогодні.`
+                  : `Welcome back${
+                      user?.firstName ? `, ${user.firstName}` : ""
+                    }! Let's check your progress today.`}
               </motion.p>
               <motion.div
                 className="flex items-center mt-3 gap-2"
@@ -269,7 +303,9 @@ export default function Dashboard() {
               >
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span className="text-sm text-slate-500">
-                  You're on a 12-day streak!
+                  {locale === "ua"
+                    ? "У вас 12-денна серія!"
+                    : "You're on a 12-day streak!"}
                 </span>
               </motion.div>
             </div>
@@ -296,7 +332,7 @@ export default function Dashboard() {
               >
                 <Link href={`/${locale}/profile`}>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     className="bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 px-6 py-3 rounded-xl"
                   >
                     <User className="h-5 w-5 mr-3" />
@@ -307,7 +343,6 @@ export default function Dashboard() {
             </motion.div>
           </motion.div>
 
-          {/* Enhanced Quick Stats */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -318,7 +353,7 @@ export default function Dashboard() {
               {
                 title: t("dashboard.currentMood"),
                 value: t("dashboard.great"),
-                change: "+2 from yesterday",
+                change: locale === "ua" ? "+2 від вчора" : "+2 from yesterday",
                 icon: Heart,
                 color: "from-emerald-500 to-green-500",
                 bgColor: "from-emerald-50 to-green-50",
@@ -326,7 +361,10 @@ export default function Dashboard() {
               {
                 title: t("dashboard.weeklyAverage"),
                 value: "7.6/10",
-                change: "+0.8 from last week",
+                change:
+                  locale === "ua"
+                    ? "+0.8 від минулого тижня"
+                    : "+0.8 from last week",
                 icon: TrendingUp,
                 color: "from-blue-500 to-indigo-500",
                 bgColor: "from-blue-50 to-indigo-50",
@@ -342,7 +380,8 @@ export default function Dashboard() {
               {
                 title: t("dashboard.nextSession"),
                 value: t("dashboard.tomorrow"),
-                change: "Dr. Smith at 2:00 PM",
+                change:
+                  locale === "ua" ? "Др. Сміт о 14:00" : "Dr. Smith at 2:00 PM",
                 icon: Calendar,
                 color: "from-purple-500 to-violet-500",
                 bgColor: "from-purple-50 to-violet-50",
@@ -360,12 +399,6 @@ export default function Dashboard() {
                         <stat.icon
                           className={`h-6 w-6 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
                         />
-                      </motion.div>
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <ChevronRight className="h-5 w-5 text-slate-400" />
                       </motion.div>
                     </div>
                     <div>
@@ -422,7 +455,7 @@ export default function Dashboard() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            {metric.charAt(0).toUpperCase() + metric.slice(1)}
+                            {getMetricLabel(metric)}
                           </motion.button>
                         ))}
                       </div>
@@ -430,7 +463,7 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={350}>
-                      <AreaChart data={moodData}>
+                      <AreaChart data={localizedDayData}>
                         <defs>
                           <linearGradient
                             id="moodGradient"
@@ -502,6 +535,10 @@ export default function Dashboard() {
                             boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
                           }}
                           labelStyle={{ color: "#1E293B", fontWeight: "600" }}
+                          formatter={(value, name) => [
+                            value,
+                            getMetricLabel(name as string),
+                          ]}
                         />
                         <Area
                           type="monotone"
@@ -510,7 +547,7 @@ export default function Dashboard() {
                           strokeWidth={3}
                           fill="url(#moodGradient)"
                           dot={{ fill: "#3B82F6", strokeWidth: 2, r: 5 }}
-                          name="Mood"
+                          name="mood"
                         />
                         <Area
                           type="monotone"
@@ -519,7 +556,7 @@ export default function Dashboard() {
                           strokeWidth={3}
                           fill="url(#energyGradient)"
                           dot={{ fill: "#10B981", strokeWidth: 2, r: 5 }}
-                          name="Energy"
+                          name="energy"
                         />
                         <Area
                           type="monotone"
@@ -528,7 +565,7 @@ export default function Dashboard() {
                           strokeWidth={3}
                           fill="url(#stressGradient)"
                           dot={{ fill: "#F59E0B", strokeWidth: 2, r: 5 }}
-                          name="Stress"
+                          name="stress"
                         />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -674,7 +711,7 @@ export default function Dashboard() {
                       >
                         <Award className="h-6 w-6 text-amber-500" />
                       </motion.div>
-                      Achievements
+                      {locale === "ua" ? "Досягнення" : "Achievements"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -695,10 +732,26 @@ export default function Dashboard() {
                           </div>
                           <div className="flex-1">
                             <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                              {achievement.title}
+                              {locale === "ua"
+                                ? {
+                                    "Meditation Master": "Майстер медитації",
+                                    "Mood Tracker": "Трекер настрою",
+                                    "Wellness Warrior": "Воїн здоров'я",
+                                  }[achievement.title] || achievement.title
+                                : achievement.title}
                             </h4>
                             <p className="text-xs text-slate-500">
-                              {achievement.description}
+                              {locale === "ua"
+                                ? {
+                                    "Complete 7 meditation sessions":
+                                      "Завершіть 7 сесій медитації",
+                                    "Log mood for 30 days straight":
+                                      "Відстежуйте настрій протягом 30 днів поспіль",
+                                    "Complete all daily goals":
+                                      "Виконайте всі щоденні цілі",
+                                  }[achievement.description] ||
+                                  achievement.description
+                                : achievement.description}
                             </p>
                           </div>
                         </div>

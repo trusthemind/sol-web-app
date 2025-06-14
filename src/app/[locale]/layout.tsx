@@ -2,12 +2,9 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { locales } from "@/lib/i18n";
 import { ThemeProvider } from "next-themes";
 import { DefaultLayout } from "@/src/components/DefaultLayout";
-import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -62,7 +59,6 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <DefaultLayout>{children}</DefaultLayout>
-          <Toaster />
         </ThemeProvider>
       </body>
     </html>

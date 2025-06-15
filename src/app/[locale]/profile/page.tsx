@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { LoadingSpinner } from "@/src/components/LoadingSpinner";
-import { ProfileHeader } from "@/src/components/ProfileHeader";
-import { ProfileAvatar } from "@/src/components/ProfileAvatar";
-import { ProgressStats } from "@/src/components/ProgressStats";
+import { ProfileHeader } from "@/src/components/profile/ProfileHeader";
+import { ProfileAvatar } from "@/src/components/profile/ProfileAvatar";
+import { ProgressStats } from "@/src/components/profile/ProgressStats";
 import { PersonalInfoForm } from "@/src/shared/widgets/PersonalForm";
-import { SecurityCard } from "@/src/components/SecurityCard";
+import { SecurityCard } from "@/src/components/profile/SecurityCard";
 import { useAuth } from "@/src/shared/stores/context/AuthContext";
 import { useProfile } from "@/src/shared/hooks/useProfile";
 import dayjs from "@/src/shared/config/dayjs";
@@ -41,8 +41,8 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="h-screen bg-white ">
+      <div className="container mx-auto px-4 mt-20 max-w-4xl">
         <ProfileHeader
           locale={locale}
           title={t("profile.title")}

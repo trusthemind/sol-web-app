@@ -121,7 +121,7 @@ export default function AuthPage() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="container mx-auto px-4 py-8"
+          className="container mx-auto px-4 py-8 mt-4"
         >
           <AuthHeader itemVariants={itemVariants} />
 

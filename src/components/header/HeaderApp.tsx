@@ -14,12 +14,13 @@ import {
   Stethoscope,
   User,
 } from "lucide-react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LanguageSwitcher } from "@/src/components/header/LanguageSwitcher";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "../shared/stores/context/AuthContext";
+import { useAuth } from "../../shared/stores/context/AuthContext";
 import Image from "next/image";
 
+// Constants and Types
 enum AppRoutes {
   HOME = "/",
   AUTH = "/auth",
@@ -36,8 +37,23 @@ interface NavItem {
   labelKey: string;
 }
 
-// Navigation configuration
-const navigationItems: NavItem[] = [
+interface UserAvatarProps {
+  avatar?: string;
+  firstName: string;
+  lastName: string;
+  size?: "sm" | "md" | "lg";
+}
+
+interface NavigationItemProps {
+  item: NavItem;
+  isActive: boolean;
+  href: string;
+  onNavigation: (route: AppRoutes) => void;
+  isMobile?: boolean;
+}
+
+// Constants
+const NAVIGATION_ITEMS: NavItem[] = [
   {
     route: AppRoutes.DASHBOARD,
     icon: LayoutDashboard,
@@ -60,98 +76,110 @@ const navigationItems: NavItem[] = [
   },
 ];
 
-// Avatar Component
-const UserAvatar = ({
-  avatar,
-  firstName,
-  lastName,
-  size = "md",
-}: {
-  avatar?: string;
-  firstName: string;
-  lastName: string;
-  size?: "sm" | "md" | "lg";
-}) => {
-  const getInitials = () => {
+const AVATAR_SIZE_CLASSES = {
+  sm: "h-8 w-8 text-sm",
+  md: "h-10 w-10 text-base",
+  lg: "h-12 w-12 text-lg",
+} as const;
+
+const SCROLL_THRESHOLD = 10;
+
+// Animation variants for better performance
+const menuVariants = {
+  closed: { opacity: 0, height: 0, y: -20 },
+  open: { opacity: 1, height: "auto", y: 0 },
+};
+
+const mobileItemVariants = {
+  hidden: { opacity: 0, x: -50 },
+  visible: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: index * 0.1,
+      type: "spring",
+      stiffness: 100,
+    },
+  }),
+};
+
+// Optimized UserAvatar Component
+const UserAvatar = ({ avatar, firstName, lastName, size = "md" }: UserAvatarProps) => {
+  const [imageError, setImageError] = useState(false);
+  
+  const initials = useMemo(() => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase() || "";
     const lastInitial = lastName?.charAt(0)?.toUpperCase() || "";
     return `${firstInitial}${lastInitial}`;
-  };
+  }, [firstName, lastName]);
 
-  const sizeClasses = {
-    sm: "h-8 w-8 text-sm",
-    md: "h-10 w-10 text-base",
-    lg: "h-12 w-12 text-lg",
-  };
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+  }, []);
+
+  const sizeClass = AVATAR_SIZE_CLASSES[size];
 
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`relative ${sizeClasses[size]} rounded-full overflow-hidden border-2 border-white shadow-lg shadow-blue-500/20 cursor-pointer`}
+      className={`relative ${sizeClass} rounded-full overflow-hidden border-2 border-white shadow-lg shadow-blue-500/20 cursor-pointer`}
+      role="button"
+      tabIndex={0}
+      aria-label={`${firstName} ${lastName} profile`}
     >
-      {avatar ? (
+      {avatar && !imageError ? (
         <Image
           src={avatar}
-          width={50}
-          height={50}
+          width={size === "lg" ? 48 : size === "md" ? 40 : 32}
+          height={size === "lg" ? 48 : size === "md" ? 40 : 32}
           alt={`${firstName} ${lastName}`}
           className="w-full h-full object-cover"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = "none";
-            target.nextElementSibling?.classList.remove("hidden");
-          }}
+          onError={handleImageError}
+          priority={size === "md"} // Prioritize main avatar
         />
-      ) : null}
-      <div
-        className={`${
-          avatar ? "hidden" : "flex"
-        } w-full h-full bg-gradient-to-br from-[#155DFC] to-blue-600 text-white items-center justify-center font-semibold`}
-      >
-        {getInitials()}
-      </div>
-      {/* Always render initials as fallback, hidden initially if avatar exists */}
-      {avatar && (
-        <div className="hidden w-full h-full bg-gradient-to-br from-[#155DFC] to-blue-600 text-white items-center justify-center font-semibold absolute inset-0">
-          {getInitials()}
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-[#155DFC] to-blue-600 text-white flex items-center justify-center font-semibold">
+          {initials}
         </div>
       )}
     </motion.div>
   );
 };
 
+// Optimized NavigationItem Component
 const NavigationItem = ({
   item,
   isActive,
   href,
   onNavigation,
   isMobile = false,
-}: {
-  item: NavItem;
-  isActive: boolean;
-  href: string;
-  onNavigation: (route: AppRoutes) => void;
-  isMobile?: boolean;
-}) => {
+}: NavigationItemProps) => {
   const { t } = useTranslation();
   const Icon = item.icon;
+
+  const handleClick = useCallback(() => {
+    onNavigation(item.route);
+  }, [item.route, onNavigation]);
+
+  const baseClasses = "flex items-center transition-all duration-300 transform";
+  const activeClasses = isActive
+    ? "bg-gradient-to-r from-[#155DFC] to-blue-600 text-white shadow-lg shadow-blue-500/20"
+    : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-600";
 
   if (isMobile) {
     return (
       <Link
         href={href}
-        className={`flex items-center space-x-3 px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${
-          isActive
-            ? "bg-gradient-to-r from-[#155DFC] to-blue-600 text-white shadow-lg shadow-blue-500/20"
-            : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-600"
-        }`}
-        onClick={() => onNavigation(item.route)}
+        className={`${baseClasses} space-x-3 px-6 py-3 rounded-xl hover:scale-[1.02] ${activeClasses}`}
+        onClick={handleClick}
+        aria-current={isActive ? "page" : undefined}
       >
         <Icon
           className={`h-5 w-5 transition-all duration-300 ${
             isActive ? "text-white" : "text-gray-500"
           }`}
+          aria-hidden="true"
         />
         <span className="font-medium">{t(item.labelKey)}</span>
       </Link>
@@ -161,8 +189,9 @@ const NavigationItem = ({
   return (
     <Link
       href={href}
-      onClick={() => onNavigation(item.route)}
+      onClick={handleClick}
       className="relative px-6 py-3 rounded-full transition-all duration-300 group hover:scale-105"
+      aria-current={isActive ? "page" : undefined}
     >
       {isActive && (
         <motion.div
@@ -178,6 +207,7 @@ const NavigationItem = ({
               ? "text-white"
               : "text-gray-500 group-hover:text-[#155DFC] group-hover:scale-110"
           }`}
+          aria-hidden="true"
         />
         <span
           className={`text-sm font-medium transition-all duration-300 ${
@@ -191,45 +221,63 @@ const NavigationItem = ({
   );
 };
 
+// Main Header Component
 export const HeaderApp: React.FC = () => {
   const { user } = useAuth();
-  const avatar = user?.avatar;
-  const lastName = user?.lastName ?? "";
-  const firstName = user?.firstName ?? "";
   const { t, locale } = useTranslation();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const shouldHideNavigation = pathname.includes("/auth");
+  // Memoized values
+  const shouldHideNavigation = useMemo(() => pathname.includes("/auth"), [pathname]);
+  
+  const userInfo = useMemo(() => ({
+    avatar: user?.avatar,
+    lastName: user?.lastName ?? "",
+    firstName: user?.firstName ?? "",
+  }), [user?.avatar, user?.lastName, user?.firstName]);
 
   const activeRoute = useMemo(() => {
     const cleanPath = pathname.replace(`/${locale}`, "") || "/";
 
-    const matchedItem = navigationItems.find((item) => {
+    const matchedItem = NAVIGATION_ITEMS.find((item) => {
       if (
         item.route === AppRoutes.DASHBOARD &&
         (cleanPath === "/" || cleanPath === "/dashboard")
-      )
+      ) {
         return true;
-      else return cleanPath.includes(item.route) && item.route !== "/";
+      }
+      return cleanPath.includes(item.route) && item.route !== "/";
     });
 
     return matchedItem?.route || AppRoutes.DASHBOARD;
   }, [pathname, locale]);
 
+  // Optimized scroll handler with throttling
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setScrolled(window.scrollY > SCROLL_THRESHOLD);
+      }, 10);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
+  // Close menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
 
+  // Memoized callbacks
   const getLocalizedPath = useCallback(
     (route: AppRoutes): string => {
       return `/${locale}${route === AppRoutes.HOME ? "" : route}`;
@@ -237,7 +285,7 @@ export const HeaderApp: React.FC = () => {
     [locale]
   );
 
-  const handleNavigation = useCallback((route: string) => {
+  const handleNavigation = useCallback(() => {
     setIsMenuOpen(false);
   }, []);
 
@@ -245,20 +293,29 @@ export const HeaderApp: React.FC = () => {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
+  // Early return for auth pages
+  if (shouldHideNavigation) {
+    return null;
+  }
+
+  const headerClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    scrolled
+      ? "bg-white/95 backdrop-blur-xl shadow-xl shadow-blue-500/5 border-b border-blue-100/20"
+      : "bg-white/90 backdrop-blur-md"
+  }`;
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", damping: 20 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 mb-12 ${
-        scrolled
-          ? "bg-white/95 backdrop-blur-xl shadow-xl shadow-blue-500/5 border-b border-blue-100/20"
-          : "bg-white/90 backdrop-blur-md"
-      } ${shouldHideNavigation ? "hidden" : ""}`}
+      className={headerClasses}
+      role="navigation"
+      aria-label="Main navigation"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center h-20">
-          {/* Logo - Left Side */}
+          {/* Logo */}
           <motion.div
             className="flex-shrink-0"
             whileHover={{ scale: 1.05 }}
@@ -267,6 +324,7 @@ export const HeaderApp: React.FC = () => {
             <Link
               href={getLocalizedPath(AppRoutes.DASHBOARD)}
               className="flex items-center space-x-3 group"
+              aria-label="Sol - Go to dashboard"
             >
               <div className="relative">
                 <motion.div
@@ -289,15 +347,16 @@ export const HeaderApp: React.FC = () => {
             </Link>
           </motion.div>
 
-          {/* Centered Navigation - Desktop */}
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center justify-center flex-1 max-w-3xl mx-auto">
             <motion.div
               className="flex items-center space-x-1 bg-gradient-to-r from-blue-50/80 to-blue-100/80 backdrop-blur-sm rounded-full p-2 shadow-lg shadow-blue-500/10 border border-blue-100/30"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
+              role="menubar"
             >
-              {navigationItems.map((item) => (
+              {NAVIGATION_ITEMS.map((item) => (
                 <NavigationItem
                   key={item.route}
                   item={item}
@@ -309,21 +368,23 @@ export const HeaderApp: React.FC = () => {
             </motion.div>
           </div>
 
+          {/* Right Side Controls */}
           <div className="flex items-center space-x-4 ml-auto">
+            {/* Desktop Controls */}
             <div className="hidden lg:flex items-center space-x-4">
               <div className="h-8 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
-
               <LanguageSwitcher />
-              <Link href={getLocalizedPath(AppRoutes.PROFILE)}>
+              <Link href={getLocalizedPath(AppRoutes.PROFILE)} aria-label="Go to profile">
                 <UserAvatar
-                  avatar={avatar}
-                  firstName={firstName}
-                  lastName={lastName}
+                  avatar={userInfo.avatar}
+                  firstName={userInfo.firstName}
+                  lastName={userInfo.lastName}
                   size="md"
                 />
               </Link>
             </div>
 
+            {/* Mobile Controls */}
             <div className="lg:hidden flex items-center space-x-3">
               <LanguageSwitcher />
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -332,6 +393,9 @@ export const HeaderApp: React.FC = () => {
                   size="icon"
                   onClick={toggleMenu}
                   className="relative rounded-full hover:bg-blue-50 transition-all duration-300 p-3"
+                  aria-expanded={isMenuOpen}
+                  aria-controls="mobile-menu"
+                  aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                 >
                   <AnimatePresence mode="wait">
                     {isMenuOpen ? (
@@ -366,11 +430,14 @@ export const HeaderApp: React.FC = () => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0, y: -20 }}
-              animate={{ opacity: 1, height: "auto", y: 0 }}
-              exit={{ opacity: 0, height: 0, y: -20 }}
+              id="mobile-menu"
+              variants={menuVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
               transition={{ duration: 0.4, ease: [0.25, 0.25, 0, 1] }}
               className="lg:hidden overflow-hidden"
+              role="menu"
             >
               <motion.div
                 className="py-6 space-y-2 bg-white/95 backdrop-blur-xl rounded-3xl mt-4 mb-4 mx-2 shadow-xl shadow-blue-500/10 border border-blue-100/20"
@@ -378,17 +445,14 @@ export const HeaderApp: React.FC = () => {
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.95 }}
               >
-                {navigationItems.map((item, index) => (
+                {NAVIGATION_ITEMS.map((item, index) => (
                   <motion.div
                     key={item.route}
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{
-                      delay: (index + 1) * 0.1,
-                      type: "spring",
-                      stiffness: 100,
-                    }}
+                    custom={index}
+                    variants={mobileItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
                   >
                     <NavigationItem
                       item={item}
@@ -400,27 +464,30 @@ export const HeaderApp: React.FC = () => {
                   </motion.div>
                 ))}
 
+                {/* Mobile Profile */}
                 <motion.div
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ delay: 0, type: "spring", stiffness: 100 }}
-                  className="px-6 py-3 border-b border-blue-100/30"
+                  custom={NAVIGATION_ITEMS.length}
+                  variants={mobileItemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  className="px-6 py-3 border-t border-blue-100/30 mt-4"
                 >
                   <Link
                     href={getLocalizedPath(AppRoutes.PROFILE)}
                     className="flex items-center space-x-3 p-2 rounded-xl hover:bg-blue-50 transition-all duration-300"
-                    onClick={() => handleNavigation(AppRoutes.PROFILE)}
+                    onClick={handleNavigation}
+                    aria-label="Go to profile"
                   >
                     <UserAvatar
-                      avatar={avatar}
-                      firstName={firstName}
-                      lastName={lastName}
+                      avatar={userInfo.avatar}
+                      firstName={userInfo.firstName}
+                      lastName={userInfo.lastName}
                       size="lg"
                     />
                     <div>
                       <div className="font-semibold text-gray-800">
-                        {firstName} {lastName}
+                        {userInfo.firstName} {userInfo.lastName}
                       </div>
                     </div>
                   </Link>

@@ -28,6 +28,8 @@ export enum EmotionTriggers {
 }
 
 export type EmotionStoreType = {
+  step: number;
+  setStep: (v: number) => void;
   selectedValue: EmotionTypeValue | "";
   setSelectedValue: (selectedValue: EmotionTypeValue) => void;
   selectedOverallNumber: number;
@@ -36,11 +38,14 @@ export type EmotionStoreType = {
   setSelectedTriggers: (selectedTriggers: EmotionTriggers) => void;
   adictionalNote: string;
   setAdictionNote: (v: string) => void;
+  clearAll: () => void;
 };
 
 export const EmotionStore = create<EmotionStoreType>()(
   persist(
     (set) => ({
+      step: 0,
+      setStep: (v: number) => set({ step: v }),
       selectedValue: EmotionTypeValue.HAPPY,
       setSelectedValue: (selectedValue) => set({ selectedValue }),
       selectedOverallNumber: 0,
@@ -52,6 +57,7 @@ export const EmotionStore = create<EmotionStoreType>()(
       setAdictionNote: (adictionalNote) => set({ adictionalNote }),
       clearAll: () =>
         set({
+          step: 0,
           selectedValue: "",
           selectedOverallNumber: 0,
           selectedTrigggers: "",

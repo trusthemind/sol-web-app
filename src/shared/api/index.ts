@@ -5,7 +5,6 @@ import { AppRoutes } from "../constants/navigation";
 enum AuthCookies {
   AUTH_TOKEN = "auth_token",
   REFRESH_TOKEN = "refresh_token",
-  CSRF_TOKEN = "csrf_token",
 }
 
 export const getCookie = (name: string): string | undefined => {
@@ -28,8 +27,8 @@ interface Config {
   cookiePrefix: string;
 }
 
-export const ParseResponse = (res: AxiosResponse<any, any>) => {
-  const { data = undefined, status, headers } = res;
+export const ParseResponse = <T>(res: AxiosResponse<T>) => {
+  const { data, status, headers } = res;
   return { data, status, headers };
 };
 

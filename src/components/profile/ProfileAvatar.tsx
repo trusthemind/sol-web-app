@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Camera, Upload, Trash2, MoreVertical, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAvatarUpload } from "../shared/hooks/useAvatarUpload";
+import { useAvatarUpload } from "../../shared/hooks/useAvatarUpload";
 
 interface ProfileAvatarProps {
   name: string;

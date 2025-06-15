@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { AppRoutes } from "../shared/constants/navigation";
-import { DeleteAccountButton } from "../shared/widgets/DeleteAccountForm";
-import { User } from "../shared/stores/context/AuthContext";
+import { AppRoutes } from "../../shared/constants/navigation";
+import { DeleteAccountButton } from "../../shared/widgets/DeleteAccountForm";
+import { User } from "../../shared/stores/context/AuthContext";
 
 interface SecurityCardProps {
   user: User;

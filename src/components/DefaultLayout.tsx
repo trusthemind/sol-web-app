@@ -1,7 +1,7 @@
 import React from "react";
 import { Toaster } from "./ui/sonner";
 import { AuthProvider } from "../shared/stores/context/AuthContext";
-import { HeaderApp } from "./HeaderApp";
+import { HeaderApp } from "./header/HeaderApp";
 
 export const DefaultLayout: React.FC<{
   children: React.ReactNode;

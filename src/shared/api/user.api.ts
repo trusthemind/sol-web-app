@@ -51,7 +51,7 @@ export const userApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: AvatarUploadResponse }> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('avatar', file);
 
     const config: AxiosRequestConfig = {
       ...opt,

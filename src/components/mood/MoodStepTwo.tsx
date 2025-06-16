@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/src/components/ui/button";
+import { Textarea } from "@/src/components/ui/textarea";
 import { ChevronDown, ChevronUp, CheckCircle, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { emotionTriggers } from "@/src/shared/constants/emotion";
 import {
@@ -15,7 +15,6 @@ import { emotionApi } from "@/src/shared/api/emotion.api";
 import { useState } from "react";
 import {
   ParsedRecommendationData,
-  parseRecommendationData,
 } from "@/src/utils/parseRecommendation";
 
 interface MoodStepTwoProps {
@@ -76,17 +75,22 @@ export default function MoodStepTwo({
     setIsLoading(true);
 
     try {
-      const rawIntensity = selectedOverallNumber || 5;
+      const rawIntensity = Math.max(
+        1,
+        Math.min(10, selectedOverallNumber || 5)
+      );
 
-      const apiResponse = await emotionApi.getInstantRecommedation({
+      const triggersArray = Array.isArray(selectedTriggers)
+        ? selectedTriggers.map((trigger) => trigger.toString())
+        : selectedTriggers
+        ? [selectedTriggers]
+        : [];
+
+      const requestData = {
         emotion: selectedValue,
         intensity: rawIntensity,
-        triggers: Array.isArray(selectedTriggers)
-          ? selectedTriggers
-          : selectedTriggers
-          ? [selectedTriggers]
-          : [],
-        notes: adictionalNote,
+        triggers: triggersArray,
+        notes: adictionalNote || "",
         tags: [
           rawIntensity >= 8
             ? "critical-intensity"
@@ -94,26 +98,36 @@ export default function MoodStepTwo({
             ? "low-intensity"
             : "medium-intensity",
         ],
-      });
+      };
 
-      console.log(apiResponse);
-      // Parse and store the recommendation data
-      const parsedRecommendations = parseRecommendationData(apiResponse.data);
-      if (parsedRecommendations) {
-        setRecommendationData(parsedRecommendations);
-        console.log("Parsed recommendations:", parsedRecommendations);
+      console.log("Sending instant recommendation request:", requestData);
+
+      const apiResponse = await emotionApi.getInstantRecommendation(
+        requestData
+      );
+
+      console.log("API Response:", apiResponse);
+
+      if (apiResponse.data && apiResponse.data.success) {
+        const recommendationData = apiResponse.data.data.recommendations;
+        setRecommendationData(recommendationData);
+      } else {
+        console.warn("Unexpected API response structure:", apiResponse);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching recommendations:", err);
-      // Continue anyway since this data is not required
+
+      if (err.response) {
+        console.error("Response data:", err.response.data);
+        console.error("Response status:", err.response.status);
+      }
     } finally {
       setIsLoading(false);
-      // Always proceed to next step
       onNext();
     }
   };
 
-  const canProceed = true; // Always allow proceeding since data is optional
+  const canProceed = true;
 
   return (
     <motion.div
@@ -145,6 +159,17 @@ export default function MoodStepTwo({
           </p>
         </motion.div>
       )}
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white/10 rounded-lg p-3 backdrop-blur-sm border border-white/20"
+      >
+        <p className="text-sm text-white/80">
+          {t("moodTracker.currentMood")}: {selectedValue} |
+          {t("moodTracker.intensity")}: {selectedOverallNumber || 5}/10
+        </p>
+      </motion.div>
 
       {/* Triggers Grid */}
       <motion.div
@@ -242,6 +267,10 @@ export default function MoodStepTwo({
           )}
           rows={4}
         />
+        <p className="text-xs text-white/60">
+          {t("moodTracker.noteHint") ||
+            "Опишіть що призвело до цієї емоції або ваші думки"}
+        </p>
       </motion.div>
 
       {/* Loading Indicator */}
@@ -254,10 +283,22 @@ export default function MoodStepTwo({
           <Loader2 className="h-5 w-5 animate-spin text-white" />
           <p className="text-sm text-white/80">
             {t("moodTracker.fetchingRecommendations") ||
-              "Отримання рекомендацій..."}
+              "Отримання персональних рекомендацій..."}
           </p>
         </motion.div>
       )}
+
+      {/* Progress Info */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white/5 rounded-lg p-3 backdrop-blur-sm border border-white/10"
+      >
+        <p className="text-xs text-white/70 text-center">
+          {t("moodTracker.step2Info") ||
+            "Крок 2 з 3: Визначення тригерів та додаткової інформації"}
+        </p>
+      </motion.div>
 
       {/* Navigation Buttons */}
       <motion.div
@@ -304,7 +345,8 @@ export default function MoodStepTwo({
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("moodTracker.loading") || "Завантаження..."}
+                {t("moodTracker.loadingRecommendations") ||
+                  "Генерація рекомендацій..."}
               </>
             ) : (
               <>

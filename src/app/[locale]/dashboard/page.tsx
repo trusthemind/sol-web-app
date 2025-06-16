@@ -339,6 +339,16 @@ export default function Dashboard() {
                     {t("dashboard.profile")}
                   </Button>
                 </Link>
+
+                <Link href={`/${locale}/mood/history`}>
+                  <Button
+                    variant="ghost"
+                    className="bg-blue/80 backdrop-blur-sm border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 px-6 py-3 rounded-xl"
+                  >
+                    <User className="h-5 w-5 mr-3" />
+                    {t("dashboard.history")}
+                  </Button>
+                </Link>
               </motion.div>
             </motion.div>
           </motion.div>

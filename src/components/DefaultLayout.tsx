@@ -9,8 +9,10 @@ export const DefaultLayout: React.FC<{
   return (
     <>
       <AuthProvider>
-      <HeaderApp />
-        <main>{children}</main>
+        <main className="relative p-0">
+          <HeaderApp />
+          {children}
+        </main>
       </AuthProvider>
       <Toaster position="top-right" expand={false} />
     </>

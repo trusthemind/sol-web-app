@@ -19,6 +19,8 @@ import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../shared/stores/context/AuthContext";
 import Image from "next/image";
+import { cn } from "@/src/lib/utils";
+import clsx from "clsx";
 
 // Constants and Types
 enum AppRoutes {
@@ -104,9 +106,14 @@ const mobileItemVariants = {
 };
 
 // Optimized UserAvatar Component
-const UserAvatar = ({ avatar, firstName, lastName, size = "md" }: UserAvatarProps) => {
+const UserAvatar = ({
+  avatar,
+  firstName,
+  lastName,
+  size = "md",
+}: UserAvatarProps) => {
   const [imageError, setImageError] = useState(false);
-  
+
   const initials = useMemo(() => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase() || "";
     const lastInitial = lastName?.charAt(0)?.toUpperCase() || "";
@@ -221,8 +228,7 @@ const NavigationItem = ({
   );
 };
 
-// Main Header Component
-export const HeaderApp: React.FC = () => {
+export const HeaderApp = () => {
   const { user } = useAuth();
   const { t, locale } = useTranslation();
   const pathname = usePathname();
@@ -230,13 +236,19 @@ export const HeaderApp: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
 
   // Memoized values
-  const shouldHideNavigation = useMemo(() => pathname.includes("/auth"), [pathname]);
-  
-  const userInfo = useMemo(() => ({
-    avatar: user?.avatar,
-    lastName: user?.lastName ?? "",
-    firstName: user?.firstName ?? "",
-  }), [user?.avatar, user?.lastName, user?.firstName]);
+  const shouldHideNavigation = useMemo(
+    () => pathname.includes("/auth"),
+    [pathname]
+  );
+
+  const userInfo = useMemo(
+    () => ({
+      avatar: user?.avatar,
+      lastName: user?.lastName ?? "",
+      firstName: user?.firstName ?? "",
+    }),
+    [user?.avatar, user?.lastName, user?.firstName]
+  );
 
   const activeRoute = useMemo(() => {
     const cleanPath = pathname.replace(`/${locale}`, "") || "/";
@@ -257,7 +269,7 @@ export const HeaderApp: React.FC = () => {
   // Optimized scroll handler with throttling
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    
+
     const handleScroll = () => {
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
@@ -293,16 +305,14 @@ export const HeaderApp: React.FC = () => {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
-  // Early return for auth pages
-  if (shouldHideNavigation) {
-    return null;
-  }
+  if (shouldHideNavigation) return null;
 
-  const headerClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+  const headerClasses = clsx(
+    `absoulte top-0 left-0 right-0 z-50 transition-all duration-500`,
     scrolled
       ? "bg-white/95 backdrop-blur-xl shadow-xl shadow-blue-500/5 border-b border-blue-100/20"
       : "bg-white/90 backdrop-blur-md"
-  }`;
+  );
 
   return (
     <motion.nav
@@ -374,7 +384,10 @@ export const HeaderApp: React.FC = () => {
             <div className="hidden lg:flex items-center space-x-4">
               <div className="h-8 w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
               <LanguageSwitcher />
-              <Link href={getLocalizedPath(AppRoutes.PROFILE)} aria-label="Go to profile">
+              <Link
+                href={getLocalizedPath(AppRoutes.PROFILE)}
+                aria-label="Go to profile"
+              >
                 <UserAvatar
                   avatar={userInfo.avatar}
                   firstName={userInfo.firstName}

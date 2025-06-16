@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent } from "@/src/components/ui/card";
 import {
   ArrowLeft,
   X,
@@ -14,6 +14,9 @@ import {
   Zap,
   Sun,
   CheckCircle,
+  Flame,
+  Trophy,
+  Target,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
@@ -28,8 +31,30 @@ import MoodStepThree from "@/src/components/mood/MoodStepThree";
 import MoodStepTwo from "@/src/components/mood/MoodStepTwo";
 import MoodStepOne from "@/src/components/mood/MoodStepOne";
 import { ParsedRecommendationData } from "@/src/utils/parseRecommendation";
-import { emotionApi } from "@/src/shared/api/emotion.api";
+import {
+  emotionApi,
+  EmotionData,
+  streakApi,
+} from "@/src/shared/api/emotion.api";
 import { useAuth } from "@/src/shared/stores/context/AuthContext";
+import Image from "next/image";
+
+interface RecentEmotion {
+  _id: string;
+  emotion: string;
+  emotionUkrainian: string;
+  intensity: number;
+  createdAt: string;
+  description?: string;
+}
+
+interface StreakData {
+  currentStreak: number;
+  longestStreak: number;
+  totalMoodTracked: number;
+  isActive: boolean;
+  lastActivityDate?: string;
+}
 
 export default function MoodTrackerRefactored() {
   const { t, locale, isLoading } = useTranslation();
@@ -46,6 +71,9 @@ export default function MoodTrackerRefactored() {
 
   const [selectedMood, setSelectedMood] = useState<any>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [recentEmotions, setRecentEmotions] = useState<EmotionData[]>([]);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const { user } = useAuth();
   const [recommendationData, setRecommendationData] =
@@ -56,54 +84,60 @@ export default function MoodTrackerRefactored() {
   }, [selectedMood]);
 
   useEffect(() => {
-    const fetchMoods = async () => {
+    const fetchData = async () => {
+      if (!user?.id) return;
+
+      setIsLoadingData(true);
       try {
-        const res = await emotionApi.getAllEmotions({
-          userId: user?.id,
-          limit: 10,
-          sortBy: "recordedAt",
-          sortOrder: "desc",
-        });
-        return res.data;
+        const [emotionsRes, streakRes] = await Promise.all([
+          emotionApi.getAllEmotions({
+            userId: user.id,
+            limit: 5,
+            sortBy: "createdAt",
+            sortOrder: "desc",
+          }),
+          streakApi.getUserStreak(user.id),
+        ]);
+
+        setRecentEmotions(emotionsRes.data.data || []);
+        setStreakData(streakRes.data.data as StreakData);
       } catch (error) {
-        console.error("Error fetching moods:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoadingData(false);
       }
     };
 
-    const data = fetchMoods();
-    console.log("Fetched moods:", data);
-  }, []);
+    fetchData();
+  }, [user?.id]);
 
-  const moodHistory = [
-    {
-      date: `${t("moodTracker.history.today")}, 9:30 AM`,
-      mood: t("moodTracker.moods.content.name"),
-      intensity: 7,
-      icon: Heart,
-      color: "text-green-500",
-    },
-    {
-      date: `${t("moodTracker.history.yesterday")}, 2:15 PM`,
-      mood: t("moodTracker.moods.anxious.name"),
-      intensity: 6,
-      icon: Zap,
-      color: "text-orange-500",
-    },
-    {
-      date: `${t("moodTracker.history.yesterday")}, 8:45 AM`,
-      mood: t("moodTracker.moods.joyful.name"),
-      intensity: 8,
-      icon: Sun,
-      color: "text-yellow-500",
-    },
-    {
-      date: `2 ${t("moodTracker.history.daysAgo")}`,
-      mood: t("moodTracker.moods.sad.name"),
-      intensity: 4,
-      icon: Frown,
-      color: "text-blue-500",
-    },
-  ];
+  const getEmotionIcon = (emotion: string) => {
+    const iconMap: Record<string, any> = {
+      joyful: Sun,
+      satisfied: Heart,
+      neutral: Calendar,
+      anxious: Zap,
+      sad: Frown,
+      angry: Flame,
+      excited: Trophy,
+      tired: Clock,
+    };
+    return iconMap[emotion] || Calendar;
+  };
+
+  const getEmotionColor = (emotion: string) => {
+    const colorMap: Record<string, string> = {
+      joyful: "text-yellow-500",
+      satisfied: "text-green-500",
+      neutral: "text-gray-500",
+      anxious: "text-orange-500",
+      sad: "text-blue-500",
+      angry: "text-red-500",
+      excited: "text-purple-500",
+      tired: "text-indigo-500",
+    };
+    return colorMap[emotion] || "text-gray-500";
+  };
 
   const handleMoodSelect = (mood: any) => {
     setSelectedMood(mood);
@@ -132,18 +166,40 @@ export default function MoodTrackerRefactored() {
     }, 300);
   };
 
-  const handleSave = () => {
-    // Save mood logic here
-    console.log("Saving mood data:", {
-      emotion: selectedValue,
-      intensity: selectedOverallNumber,
-      triggers: selectedTriggers,
-      note: adictionalNote,
-    });
+  const handleSave = async () => {
+    if (!user?.id) return;
 
-    setTimeout(() => {
-      window.location.href = `/${locale}/dashboard`;
-    }, 1000);
+    try {
+      const emotionData = {
+        userId: user.id,
+        emotion: selectedValue,
+        intensity: selectedOverallNumber,
+        triggers: selectedTriggers,
+        description: adictionalNote,
+      };
+
+      await emotionApi.createEmotion(emotionData);
+
+      // Оновлюємо дані після збереження
+      const [emotionsRes, streakRes] = await Promise.all([
+        emotionApi.getAllEmotions({
+          userId: user.id,
+          limit: 5,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        }),
+        streakApi.getUserStreak(user.id),
+      ]);
+
+      setRecentEmotions(emotionsRes.data.data || []);
+      setStreakData(streakRes.data.data as StreakData);
+
+      setTimeout(() => {
+        window.location.href = `/${locale}/dashboard`;
+      }, 1000);
+    } catch (error) {
+      console.error("Error saving emotion:", error);
+    }
   };
 
   const nextStep = () => {
@@ -154,16 +210,8 @@ export default function MoodTrackerRefactored() {
     setStep(step - 1);
   };
 
-  // Dynamic background animation component
   const DynamicBackground = ({ mood }: { mood: any }) => {
-    const particleCount =
-      mood.particles === "minimal"
-        ? 8
-        : mood.particles === "electric"
-        ? 25
-        : 15;
-    const animation = getParticleAnimation(mood.particles);
-
+    //
     return (
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -171,27 +219,6 @@ export default function MoodTrackerRefactored() {
           animate={{ opacity: [0.85, 0.95, 0.85] }}
           transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
         />
-
-        {[...Array(particleCount)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            {...animation}
-            transition={{
-              ...animation.transition,
-              delay: i * 0.1,
-            }}
-          >
-            <mood.effectIcon
-              className="text-white/30"
-              size={Math.random() * 20 + 10}
-            />
-          </motion.div>
-        ))}
 
         {[...Array(5)].map((_, i) => (
           <motion.div
@@ -269,17 +296,38 @@ export default function MoodTrackerRefactored() {
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center border-2 gap-2 border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
-            >
-              <Clock className="h-4 w-4" />
-              {showHistory
-                ? t("moodTracker.hideHistory")
-                : t("moodTracker.showHistory")}
-            </Button>
+
+            <div className="flex items-center space-x-4">
+              {/* Streak Display */}
+              {streakData && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-orange-50 to-red-50 px-4 py-2 rounded-full border border-orange-200"
+                >
+                  <Flame className="h-4 w-4 text-orange-500" />
+                  <span className="text-sm font-medium text-orange-700">
+                    {streakData.currentStreak} {t("moodTracker.streak.days")}
+                  </span>
+                  <div className="text-xs text-orange-600">
+                    🔥 {streakData.totalMoodTracked}{" "}
+                    {t("moodTracker.streak.total")}
+                  </div>
+                </motion.div>
+              )}
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHistory(!showHistory)}
+                className="flex items-center border-2 gap-2 border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
+              >
+                <Clock className="h-4 w-4" />
+                {showHistory
+                  ? t("moodTracker.hideHistory")
+                  : t("moodTracker.showHistory")}
+              </Button>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -305,46 +353,76 @@ export default function MoodTrackerRefactored() {
                     <Calendar className="h-5 w-5 mr-2 text-blue-500" />
                     {t("moodTracker.recentEntries")}
                   </motion.h3>
-                  <div className="space-y-3">
-                    {moodHistory.map((entry, i) => (
+
+                  {isLoadingData ? (
+                    <div className="flex justify-center py-8">
                       <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200"
-                      >
-                        <div className="flex items-center gap-4">
+                        className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "linear",
+                        }}
+                      />
+                    </div>
+                  ) : recentEmotions.length > 0 ? (
+                    <div className="space-y-3">
+                      {recentEmotions.map((emotion, i) => {
+                        const EmotionIcon = getEmotionIcon(emotion.emotion);
+                        const emotionColor = getEmotionColor(emotion.emotion);
+
+                        return (
                           <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            className={`p-2 rounded-full bg-white ${entry.color}`}
+                            key={emotion._id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200"
                           >
-                            <entry.icon className="h-5 w-5" />
+                            <div className="flex items-center gap-4">
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                className={`p-2 rounded-full bg-white ${emotionColor}`}
+                              >
+                                <EmotionIcon className="h-5 w-5" />
+                              </motion.div>
+                              <div>
+                                <p className="font-medium text-gray-900">
+                                  {emotion.emotionUkrainian || emotion.emotion}
+                                </p>
+                                {emotion.description && (
+                                  <p className="text-xs text-gray-400 mt-1">
+                                    {emotion.description.slice(0, 50)}...
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="text-sm font-medium text-gray-700">
+                                {t("moodTracker.intensity")}
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                              >
+                                {t("moodTracker.view")}
+                              </Button>
+                            </div>
                           </motion.div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {entry.mood}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {entry.date}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-sm font-medium text-gray-700">
-                            {t("moodTracker.intensity")}: {entry.intensity}/10
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                          >
-                            {t("moodTracker.view")}
-                          </Button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <p>{t("moodTracker.noEntries")}</p>
+                      <p className="text-sm mt-2">
+                        {t("moodTracker.startTracking")}
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -362,7 +440,7 @@ export default function MoodTrackerRefactored() {
               className="max-w-4xl mx-auto"
             >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {moods(t).map((mood, index) => {
+                {moods(t, locale).map((mood, index) => {
                   const moodAnimation = getMoodAnimation(mood.animation);
                   return (
                     <motion.div
@@ -392,8 +470,12 @@ export default function MoodTrackerRefactored() {
                             {...moodAnimation}
                             whileHover={{ scale: 1.15, rotate: 5 }}
                           >
-                            <mood.icon
-                              className={`h-8 w-8 ${mood.iconColor}`}
+                            <Image
+                              src={mood.icon}
+                              alt={mood.affirmation}
+                              width={64}
+                              height={64}
+                              className={`h-13 w-13 ${mood.iconColor}`}
                             />
                           </motion.div>
                           <h3 className="text-lg font-semibold mb-2 text-gray-900">
@@ -403,9 +485,7 @@ export default function MoodTrackerRefactored() {
                             {mood.description}
                           </p>
                         </CardContent>
-                        <motion.div
-                          className={`absolute inset-0 ${mood.bgColor} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                        />
+
                         <motion.div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </Card>
                     </motion.div>

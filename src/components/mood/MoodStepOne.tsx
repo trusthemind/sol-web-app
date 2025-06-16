@@ -1,19 +1,23 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { EnhancedSlider } from "@/components/ui/enchanted-slider";
+import { Button } from "@/src/components/ui/button";
+import { EnhancedSlider } from "@/src/components/ui/enchanted-slider";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { getMoodAnimation } from "@/src/utils/getMoodAnimation";
 import { EmotionStore } from "@/src/shared/stores/emotion.store";
+import Image from "next/image";
 
 interface MoodStepOneProps {
   selectedMood: any;
   onNext: () => void;
 }
 
-export default function MoodStepOne({ selectedMood, onNext }: MoodStepOneProps) {
+export default function MoodStepOne({
+  selectedMood,
+  onNext,
+}: MoodStepOneProps) {
   const { t } = useTranslation();
   const { selectedOverallNumber, setSelectedOverallNumber } = EmotionStore();
 
@@ -54,7 +58,14 @@ export default function MoodStepOne({ selectedMood, onNext }: MoodStepOneProps) 
             repeat: Number.POSITIVE_INFINITY,
           }}
         >
-          <selectedMood.icon className="h-16 w-16 text-white" />
+          <div className="h-16 w-16 text-white">
+            <Image
+              src={selectedMood.icon}
+              alt={selectedMood.affirmation}
+              width={64}
+              height={64}
+            />
+          </div>
         </motion.div>
       </motion.div>
 
@@ -94,21 +105,17 @@ export default function MoodStepOne({ selectedMood, onNext }: MoodStepOneProps) 
           >
             {t("moodTracker.intensityQuestion")}
           </motion.p>
-          
+
           {/* Slider with Labels */}
           <div className="flex items-center gap-4">
-            <span className="text-sm opacity-75">
-              {t("moodTracker.mild")}
-            </span>
+            <span className="text-sm opacity-75">{t("moodTracker.mild")}</span>
             <div className="flex-1 px-2">
               <EnhancedSlider
                 value={[selectedOverallNumber]}
                 min={1}
                 max={10}
                 step={1}
-                onValueChange={(value) =>
-                  setSelectedOverallNumber(value[0])
-                }
+                onValueChange={(value) => setSelectedOverallNumber(value[0])}
                 moodColor={selectedMood.primaryColor}
                 glowEffect={true}
                 className="w-full"
@@ -118,30 +125,9 @@ export default function MoodStepOne({ selectedMood, onNext }: MoodStepOneProps) 
               {t("moodTracker.strong")}
             </span>
           </div>
-          
-          {/* Intensity Display */}
-          <motion.div
-            className="text-center font-semibold text-2xl mt-3"
-            animate={{
-              scale: [1, 1.1, 1],
-              color: [
-                selectedMood.primaryColor,
-                "#ffffff",
-                selectedMood.primaryColor,
-              ],
-            }}
-            transition={{ duration: 0.3 }}
-            key={selectedOverallNumber}
-          >
-            {selectedOverallNumber}/10
-          </motion.div>
         </div>
 
-        {/* Continue Button */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
             onClick={onNext}
             size="lg"

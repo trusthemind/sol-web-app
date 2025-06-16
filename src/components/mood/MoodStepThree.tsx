@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   ChevronUp,
   Save,
@@ -15,6 +15,8 @@ import {
   Heart,
   CheckCircle,
   ArrowRight,
+  Flame,
+  Trophy,
 } from "lucide-react";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { EmotionStore } from "@/src/shared/stores/emotion.store";
@@ -22,7 +24,7 @@ import { emotionApi } from "@/src/shared/api/emotion.api";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/src/shared/stores/context/AuthContext";
-import { cn } from "@/lib/utils";
+import { cn } from "@/src/lib/utils";
 import { ParsedRecommendationData } from "@/src/utils/parseRecommendation";
 
 interface MoodStepThreeProps {
@@ -162,7 +164,7 @@ export default function MoodStepThree({
 }: MoodStepThreeProps) {
   const { t } = useTranslation();
 
-  console.log(recommendationData, "recived");
+  console.log(recommendationData, "received");
   const {
     selectedValue,
     selectedOverallNumber,
@@ -173,59 +175,74 @@ export default function MoodStepThree({
   const { user } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [streakInfo, setStreakInfo] = useState<any>(null);
 
   const handleSaveEmotion = async () => {
+    if (!user?.id) {
+      toast.error("Користувач не знайдений");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const rawIntensity = selectedOverallNumber || 5;
+      const normalizedIntensity = Math.max(
+        1,
+        Math.min(10, selectedOverallNumber || 5)
+      );
+
+      const triggersArray = Array.isArray(selectedTriggers)
+        ? selectedTriggers.map((trigger) => trigger.toString())
+        : selectedTriggers
+        ? [selectedTriggers]
+        : [];
 
       const emotionData = {
-        userId: user?.id,
-        emotion: selectedMood?.name || selectedValue,
-        intensity: rawIntensity,
-        triggers: Array.isArray(selectedTriggers)
-          ? selectedTriggers
-          : selectedTriggers
-          ? [selectedTriggers]
-          : [],
-        notes: adictionalNote ?? "",
+        userId: user.id,
+        emotion: selectedValue,
+        intensity: normalizedIntensity,
+        description: adictionalNote || "",
+        triggers: triggersArray,
         tags: [
           ...(selectedMood?.category ? [selectedMood.category] : []),
           ...(selectedMood?.tags || []),
-          rawIntensity >= 8
+          normalizedIntensity >= 8
             ? "high-intensity"
-            : rawIntensity <= 3
+            : normalizedIntensity <= 3
             ? "low-intensity"
             : "medium-intensity",
         ],
-        recordedAt: new Date(),
+        activities: [],
       };
 
       console.log("Sending emotion data:", emotionData);
 
-      const response = await emotionApi.createEmotion(emotionData as any);
+      const response = await emotionApi.createEmotion(emotionData);
 
       if (response.data.success) {
+        if (response.data.data.streak) setStreakInfo(response.data.data.streak);
+
         toast.success(
-          t("moodTracker.emotionSaved") || "Emotion saved successfully!"
+          t("moodTracker.emotionSaved") || "Емоція збережена успішно!"
         );
 
-        onSave();
         setTimeout(() => {
+          onSave();
           resetStore();
-        }, 200);
+        }, 2000);
       } else {
         throw new Error("Failed to save emotion");
       }
     } catch (error: any) {
       console.error("Error saving emotion:", error);
 
-      toast.error(
+      const errorMessage =
         error.response?.data?.message ||
-          t("moodTracker.emotionSaveError") ||
-          "Failed to save emotion. Please try again."
-      );
+        error.message ||
+        t("moodTracker.emotionSaveError") ||
+        "Не вдалося зберегти емоцію. Спробуйте знову.";
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -238,6 +255,74 @@ export default function MoodStepThree({
       recommendationData.longTerm.length > 0 ||
       recommendationData.resources.length > 0 ||
       recommendationData.coping.length > 0);
+
+  if (streakInfo) {
+    return (
+      <motion.div
+        key="streak-celebration"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="text-center space-y-6"
+      >
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 2, ease: "linear" }}
+        >
+          <Flame className="h-20 w-20 text-orange-400 mx-auto" />
+        </motion.div>
+
+        <div>
+          <h2 className="text-3xl font-bold text-white mb-2">🎉 Вітаємо!</h2>
+          <p className="text-white/80">
+            Ваша емоція збережена і стрік оновлено
+          </p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-r from-orange-500/20 to-red-500/20 p-6 rounded-2xl border border-orange-300/30 backdrop-blur-sm"
+        >
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <Flame className="h-8 w-8 text-orange-400" />
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">
+                {streakInfo.currentStreak}
+              </div>
+              <div className="text-sm text-white/70">днів поспіль</div>
+            </div>
+            <Trophy className="h-8 w-8 text-yellow-400" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-white">
+                {streakInfo.longestStreak}
+              </div>
+              <div className="text-white/60">Найдовший стрік</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-white">
+                {streakInfo.totalMoodTracked}
+              </div>
+              <div className="text-white/60">Всього записів</div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-white/70 text-sm"
+        >
+          Продовжуйте відстежувати емоції щодня для підтримки стріка! 🔥
+        </motion.p>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -302,7 +387,9 @@ export default function MoodStepThree({
           </div>
           <div>
             <span className="text-white/60">Інтенсивність:</span>
-            <p className="font-medium text-white">{selectedOverallNumber}/10</p>
+            <p className="font-medium text-white">
+              {Math.max(1, Math.min(10, selectedOverallNumber || 5))}/10
+            </p>
           </div>
           {selectedTriggers &&
             Array.isArray(selectedTriggers) &&
@@ -314,6 +401,15 @@ export default function MoodStepThree({
                 </p>
               </div>
             )}
+          {adictionalNote && (
+            <div className="col-span-2">
+              <span className="text-white/60">Нотатка:</span>
+              <p className="font-medium text-white text-xs leading-relaxed">
+                {adictionalNote.slice(0, 100)}
+                {adictionalNote.length > 100 && "..."}
+              </p>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -389,8 +485,8 @@ export default function MoodStepThree({
             Дякуємо за ваш запис!
           </h3>
           <p className="text-white/70 text-sm">
-            Ваша емоція збережена. Персональні рекомендації будуть доступні в
-            наступних записах.
+            Ваша емоція буде збережена. Персональні рекомендації будуть доступні
+            в наступних записах.
           </p>
         </motion.div>
       )}

@@ -1,4 +1,3 @@
-
 import { AxiosRequestConfig } from "axios";
 import { api, ParseResponse } from ".";
 
@@ -6,34 +5,53 @@ export interface EmotionData {
   _id?: string;
   userId: string;
   emotion: string;
-  intensity: number | string;
+  emotionUkrainian?: string;
+  intensity: number;
+  description?: string;
   triggers?: string[];
   tags?: string[];
-  notes?: string;
-  recordedAt?: Date | string;
+  stressLevel?: number;
+  activities?: string[];
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface StreakData {
+  currentStreak: number;
+  longestStreak: number;
+  totalMoodTracked: number;
+  lastActivityDate?: Date;
+  streakStartDate?: Date;
+  isActive: boolean;
 }
 
 export interface EmotionFilters {
   userId?: string;
   emotion?: string | string[];
-  intensity?: number | string;
-  timeRange?: "day" | "week" | "month" | "year";
+  intensity?: number;
+  minIntensity?: number;
+  maxIntensity?: number;
+  stressLevel?: number;
+  minStressLevel?: number;
+  maxStressLevel?: number;
+  timeRange?: "today" | "week" | "month" | "quarter" | "year";
   startDate?: Date | string;
   endDate?: Date | string;
   tags?: string[];
   triggers?: string[];
   limit?: number;
   skip?: number;
-  sortBy?: string;
+  sortBy?: "createdAt" | "intensity" | "stressLevel" | "emotion";
   sortOrder?: "asc" | "desc";
 }
 
 export interface EmotionResponse {
   success: boolean;
   message?: string;
-  data: EmotionData;
+  data: {
+    emotion: EmotionData;
+    streak?: StreakData;
+  };
 }
 
 export interface EmotionsListResponse {
@@ -41,18 +59,21 @@ export interface EmotionsListResponse {
   data: EmotionData[];
   total: number;
   filters: EmotionFilters;
+  streak?: StreakData;
 }
 
 export interface EmotionStatsResponse {
   success: boolean;
   data: {
     totalEntries: number;
+    averageIntensity: number;
+    averageStressLevel: number;
     mostCommonEmotion: string;
     mostCommonIntensity: number;
-    averageIntensity: number;
-    emotionBreakdown: Record<string, number>;
-    intensityDistribution: Record<string, number>;
-    timePatterns?: any;
+    emotionDistribution: Record<string, number>;
+    intensityDistribution: Record<number, number>;
+    trendsOverTime: any[];
+    streak?: StreakData;
   };
 }
 
@@ -71,9 +92,17 @@ export interface EmotionPatternsResponse {
 export interface EmotionAnalysisResponse {
   success: boolean;
   data: {
-    analysis: string;
+    analysis: {
+      insights: string[];
+      trends: string[];
+      concerns: string[];
+      positives: string[];
+      emotionalBalance: string;
+      riskFactors: string[];
+    };
     summary: {
       totalEntries: number;
+      averageIntensity: number;
       mostCommonIntensity: number;
       mostCommonEmotion: string;
       timeRange: string;
@@ -84,10 +113,18 @@ export interface EmotionAnalysisResponse {
 export interface EmotionRecommendationsResponse {
   success: boolean;
   data: {
-    recommendations: string;
+    recommendations: {
+      immediate: string[];
+      shortTerm: string[];
+      longTerm: string[];
+      professionalHelp: boolean;
+      resources: string[];
+      coping: string[];
+    };
     basedOn: {
       entriesAnalyzed: number;
       timeRange: string;
+      averageIntensity: number;
       mostCommonIntensity: number;
       dominantEmotion: string;
     };
@@ -97,14 +134,36 @@ export interface EmotionRecommendationsResponse {
 export interface EmotionOverallSummaryResponse {
   success: boolean;
   data: {
-    summary: string;
-    analysis: string;
-    recommendations: string;
+    summary: {
+      emotionalWellbeing: string;
+      keyInsights: string[];
+      actionPlan: string[];
+      progress: string;
+      nextSteps: string[];
+    };
+    analysis: {
+      insights: string[];
+      trends: string[];
+      concerns: string[];
+      positives: string[];
+      emotionalBalance: string;
+      riskFactors: string[];
+    };
+    recommendations: {
+      immediate: string[];
+      shortTerm: string[];
+      longTerm: string[];
+      professionalHelp: boolean;
+      resources: string[];
+      coping: string[];
+    };
     stats: any;
+    streak?: StreakData;
     metadata: {
       timeRange: string;
       entriesAnalyzed: number;
       generatedAt: Date;
+      averageIntensity: number;
       mostCommonIntensity: number;
       mostCommonEmotion: string;
     };
@@ -123,6 +182,27 @@ export interface EmotionSearchResponse {
   data: EmotionData[];
   total: number;
   filters: EmotionFilters;
+}
+
+export interface StreakResponse {
+  success: boolean;
+  data: StreakData;
+}
+
+export interface StreakStatsResponse {
+  success: boolean;
+  data: StreakData & {
+    streakDuration: number;
+    daysSinceLastActivity: number | null;
+    averageEntriesPerDay: string;
+  };
+}
+
+export interface TopStreaksResponse {
+  success: boolean;
+  data: (StreakData & { userId: { firstName?: string; lastName?: string } })[];
+  limit: number;
+  count: number;
 }
 
 export const emotionApi = {
@@ -185,11 +265,11 @@ export const emotionApi = {
 
   async getEmotionsByTimeRange(
     userId: string,
-    timeRange: "day" | "week" | "month" | "year",
+    timeRange: "today" | "week" | "month" | "quarter" | "year", 
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionsByTimeRangeResponse }> {
     const res = await api.get(
-      `/emotions/${userId}/timerange/${timeRange}`,
+      `/emotions/user/${userId}/timerange/${timeRange}`,
       opt
     );
     return ParseResponse(res);
@@ -215,7 +295,7 @@ export const emotionApi = {
     }
 
     const res = await api.get(
-      `/emotions/${userId}/stats?${params.toString()}`,
+      `/emotions/user/${userId}/stats?${params.toString()}`,
       opt
     );
     return ParseResponse(res);
@@ -226,7 +306,10 @@ export const emotionApi = {
     days: number = 30,
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionPatternsResponse }> {
-    const res = await api.get(`/emotions/${userId}/patterns?days=${days}`, opt);
+    const res = await api.get(
+      `/emotions/user/${userId}/patterns?days=${days}`,
+      opt
+    );
     return ParseResponse(res);
   },
 
@@ -236,7 +319,7 @@ export const emotionApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionAnalysisResponse }> {
     const res = await api.get(
-      `/emotions/${userId}/analysis?timeRange=${timeRange}`,
+      `/emotions/user/${userId}/analysis?timeRange=${timeRange}`,
       opt
     );
     return ParseResponse(res);
@@ -248,24 +331,24 @@ export const emotionApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionRecommendationsResponse }> {
     const res = await api.get(
-      `/emotions/${userId}/recommendations?timeRange=${timeRange}`,
+      `/emotions/user/${userId}/recommendations?timeRange=${timeRange}`,
       opt
     );
     return ParseResponse(res);
   },
 
-  async getInstantRecommedation(
+  async getInstantRecommendation(
     data: {
       emotion: string;
       intensity: number;
-      triggers: string[];
-      notes: string;
-      tags: string[];
+      triggers?: string[];
+      notes?: string;
+      tags?: string[];
     },
     opt?: AxiosRequestConfig
-  ) {
-    const res = await api.post(`/emotions/recommendations`, data, opt);
-    return res;
+  ): Promise<{ data: EmotionRecommendationsResponse }> {
+    const res = await api.post(`/emotions/recommendations/instant`, data, opt);
+    return ParseResponse(res);
   },
 
   async getOverallSummary(
@@ -274,7 +357,7 @@ export const emotionApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionOverallSummaryResponse }> {
     const res = await api.get(
-      `/emotions/${userId}/summary?timeRange=${timeRange}`,
+      `/emotions/user/${userId}/summary?timeRange=${timeRange}`,
       opt
     );
     return ParseResponse(res);
@@ -284,7 +367,7 @@ export const emotionApi = {
     searchFilters: {
       userId: string;
       emotions?: string[];
-      intensity?: number | string;
+      intensity?: number;
       tags?: string[];
       triggers?: string[];
       startDate?: Date | string;
@@ -312,6 +395,48 @@ export const emotionApi = {
   },
 };
 
+export const streakApi = {
+  async getUserStreak(
+    userId: string,
+    opt?: AxiosRequestConfig
+  ): Promise<{ data: StreakResponse }> {
+    const res = await api.get(`/streaks/user/${userId}`, opt);
+    return ParseResponse(res);
+  },
+
+  async getStreakStats(
+    userId: string,
+    opt?: AxiosRequestConfig
+  ): Promise<{ data: StreakStatsResponse }> {
+    const res = await api.get(`/streaks/user/${userId}/stats`, opt);
+    return ParseResponse(res);
+  },
+
+  async getTopStreaks(
+    limit: number = 10,
+    opt?: AxiosRequestConfig
+  ): Promise<{ data: TopStreaksResponse }> {
+    const res = await api.get(`/streaks/top?limit=${limit}`, opt);
+    return ParseResponse(res);
+  },
+
+  async resetUserStreak(
+    userId: string,
+    opt?: AxiosRequestConfig
+  ): Promise<{ data: StreakResponse }> {
+    const res = await api.post(`/streaks/user/${userId}/reset`, {}, opt);
+    return ParseResponse(res);
+  },
+
+  async deleteUserStreak(
+    userId: string,
+    opt?: AxiosRequestConfig
+  ): Promise<{ data: { success: boolean; message: string } }> {
+    const res = await api.delete(`/streaks/user/${userId}`, opt);
+    return ParseResponse(res);
+  },
+};
+
 export const emotionApiHelpers = {
   async getRecentEmotions(
     userId: string,
@@ -322,7 +447,7 @@ export const emotionApiHelpers = {
       {
         userId,
         limit,
-        sortBy: "recordedAt",
+        sortBy: "createdAt",
         sortOrder: "desc",
       },
       opt
@@ -330,7 +455,7 @@ export const emotionApiHelpers = {
   },
 
   async getTodayEmotions(userId: string, opt?: AxiosRequestConfig) {
-    return emotionApi.getEmotionsByTimeRange(userId, "day", opt);
+    return emotionApi.getEmotionsByTimeRange(userId, "today", opt);
   },
 
   async getWeekEmotions(userId: string, opt?: AxiosRequestConfig) {
@@ -348,7 +473,7 @@ export const emotionApiHelpers = {
         userId,
         emotion: emotionType,
         limit,
-        sortBy: "recordedAt",
+        sortBy: "createdAt",
         sortOrder: "desc",
       },
       opt
@@ -357,7 +482,7 @@ export const emotionApiHelpers = {
 
   async getEmotionsByIntensity(
     userId: string,
-    intensity: number | string,
+    intensity: number,
     limit: number = 50,
     opt?: AxiosRequestConfig
   ) {
@@ -366,7 +491,27 @@ export const emotionApiHelpers = {
         userId,
         intensity,
         limit,
-        sortBy: "recordedAt",
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      },
+      opt
+    );
+  },
+
+  async getEmotionsByIntensityRange(
+    userId: string,
+    minIntensity: number,
+    maxIntensity: number,
+    limit: number = 50,
+    opt?: AxiosRequestConfig
+  ) {
+    return emotionApi.getAllEmotions(
+      {
+        userId,
+        minIntensity,
+        maxIntensity,
+        limit,
+        sortBy: "createdAt",
         sortOrder: "desc",
       },
       opt
@@ -386,7 +531,7 @@ export const emotionApiHelpers = {
         startDate,
         endDate,
         limit,
-        sortBy: "recordedAt",
+        sortBy: "createdAt",
         sortOrder: "desc",
       },
       opt
@@ -398,11 +543,12 @@ export const emotionApiHelpers = {
     timeRange: string = "month",
     opt?: AxiosRequestConfig
   ) {
-    const [summary, stats, patterns, recent] = await Promise.all([
+    const [summary, stats, patterns, recent, streak] = await Promise.all([
       emotionApi.getOverallSummary(userId, timeRange, opt),
       emotionApi.getEmotionStats(userId, { timeRange: timeRange as any }, opt),
       emotionApi.getEmotionPatterns(userId, 30, opt),
       emotionApiHelpers.getRecentEmotions(userId, 5, opt),
+      streakApi.getUserStreak(userId, opt),
     ]);
 
     return {
@@ -410,6 +556,21 @@ export const emotionApiHelpers = {
       stats: stats.data,
       patterns: patterns.data,
       recent: recent.data,
+      streak: streak.data,
+    };
+  },
+
+  async getUserStreakDashboard(userId: string, opt?: AxiosRequestConfig) {
+    const [streak, stats, topStreaks] = await Promise.all([
+      streakApi.getUserStreak(userId, opt),
+      streakApi.getStreakStats(userId, opt),
+      streakApi.getTopStreaks(10, opt),
+    ]);
+
+    return {
+      userStreak: streak.data,
+      stats: stats.data,
+      topStreaks: topStreaks.data,
     };
   },
 };

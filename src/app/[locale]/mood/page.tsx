@@ -28,6 +28,8 @@ import MoodStepThree from "@/src/components/mood/MoodStepThree";
 import MoodStepTwo from "@/src/components/mood/MoodStepTwo";
 import MoodStepOne from "@/src/components/mood/MoodStepOne";
 import { ParsedRecommendationData } from "@/src/utils/parseRecommendation";
+import { emotionApi } from "@/src/shared/api/emotion.api";
+import { useAuth } from "@/src/shared/stores/context/AuthContext";
 
 export default function MoodTrackerRefactored() {
   const { t, locale, isLoading } = useTranslation();
@@ -44,12 +46,33 @@ export default function MoodTrackerRefactored() {
 
   const [selectedMood, setSelectedMood] = useState<any>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  const { user } = useAuth();
   const [recommendationData, setRecommendationData] =
     useState<ParsedRecommendationData | null>(null);
 
   useEffect(() => {
     if (selectedMood && selectedMood.name) setSelectedValue(selectedMood.name);
   }, [selectedMood]);
+
+  useEffect(() => {
+    const fetchMoods = async () => {
+      try {
+        const res = await emotionApi.getAllEmotions({
+          userId: user?.id,
+          limit: 10,
+          sortBy: "recordedAt",
+          sortOrder: "desc",
+        });
+        return res.data;
+      } catch (error) {
+        console.error("Error fetching moods:", error);
+      }
+    };
+
+    const data = fetchMoods();
+    console.log("Fetched moods:", data);
+  }, []);
 
   const moodHistory = [
     {

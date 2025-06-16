@@ -6,6 +6,7 @@ enum AppRoutes {
   PROFILE = "/profile",
   NOT_FOUND = "*",
   MOOD = "/mood",
+  MOOD_HISTORY = "/mood/history",
   DOCTORS = "/doctors",
 }
 

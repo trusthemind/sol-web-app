@@ -421,7 +421,7 @@ export interface EmotionFilters {
   userId?: string;
   emotion?: string | string[];
   intensity?: number | string;
-  timeRange?: 'day' | 'week' | 'month' | 'year';
+  timeRange?: "day" | "week" | "month" | "year";
   startDate?: Date | string;
   endDate?: Date | string;
   tags?: string[];
@@ -429,7 +429,7 @@ export interface EmotionFilters {
   limit?: number;
   skip?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface EmotionResponse {
@@ -529,7 +529,7 @@ export interface EmotionSearchResponse {
 
 export const emotionApi = {
   async createEmotion(
-    emotionData: Omit<EmotionData, '_id' | 'createdAt' | 'updatedAt'>,
+    emotionData: Omit<EmotionData, "_id" | "createdAt" | "updatedAt">,
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionResponse }> {
     const res = await api.post("/emotions", emotionData, opt);
@@ -541,12 +541,12 @@ export const emotionApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionsListResponse }> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
-            params.append(key, value.join(','));
+            params.append(key, value.join(","));
           } else if (value instanceof Date) {
             params.append(key, value.toISOString());
           } else {
@@ -587,20 +587,23 @@ export const emotionApi = {
 
   async getEmotionsByTimeRange(
     userId: string,
-    timeRange: 'day' | 'week' | 'month' | 'year',
+    timeRange: "day" | "week" | "month" | "year",
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionsByTimeRangeResponse }> {
-    const res = await api.get(`/emotions/${userId}/timerange/${timeRange}`, opt);
+    const res = await api.get(
+      `/emotions/${userId}/timerange/${timeRange}`,
+      opt
+    );
     return ParseResponse(res);
   },
 
   async getEmotionStats(
     userId: string,
-    filters?: Pick<EmotionFilters, 'timeRange' | 'startDate' | 'endDate'>,
+    filters?: Pick<EmotionFilters, "timeRange" | "startDate" | "endDate">,
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionStatsResponse }> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -613,7 +616,10 @@ export const emotionApi = {
       });
     }
 
-    const res = await api.get(`/emotions/${userId}/stats?${params.toString()}`, opt);
+    const res = await api.get(
+      `/emotions/${userId}/stats?${params.toString()}`,
+      opt
+    );
     return ParseResponse(res);
   },
 
@@ -628,28 +634,51 @@ export const emotionApi = {
 
   async getEmotionAnalysis(
     userId: string,
-    timeRange: string = 'month',
+    timeRange: string = "month",
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionAnalysisResponse }> {
-    const res = await api.get(`/emotions/${userId}/analysis?timeRange=${timeRange}`, opt);
+    const res = await api.get(
+      `/emotions/${userId}/analysis?timeRange=${timeRange}`,
+      opt
+    );
     return ParseResponse(res);
   },
 
   async getRecommendations(
     userId: string,
-    timeRange: string = 'week',
+    timeRange: string = "week",
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionRecommendationsResponse }> {
-    const res = await api.get(`/emotions/${userId}/recommendations?timeRange=${timeRange}`, opt);
+    const res = await api.get(
+      `/emotions/${userId}/recommendations?timeRange=${timeRange}`,
+      opt
+    );
     return ParseResponse(res);
+  },
+
+  async getInstantRecommedation(
+    data: {
+      emotion: string;
+      intensity: number;
+      triggers: string[];
+      notes: string;
+      tags: string[];
+    },
+    opt?: AxiosRequestConfig
+  ) {
+    const res = await api.post(`/emotions/recommendations`, data, opt);
+    return res;
   },
 
   async getOverallSummary(
     userId: string,
-    timeRange: string = 'month',
+    timeRange: string = "month",
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionOverallSummaryResponse }> {
-    const res = await api.get(`/emotions/${userId}/summary?timeRange=${timeRange}`, opt);
+    const res = await api.get(
+      `/emotions/${userId}/summary?timeRange=${timeRange}`,
+      opt
+    );
     return ParseResponse(res);
   },
 
@@ -667,11 +696,11 @@ export const emotionApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionSearchResponse }> {
     const params = new URLSearchParams();
-    
+
     Object.entries(searchFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         if (Array.isArray(value)) {
-          params.append(key, value.join(','));
+          params.append(key, value.join(","));
         } else if (value instanceof Date) {
           params.append(key, value.toISOString());
         } else {
@@ -691,26 +720,23 @@ export const emotionApiHelpers = {
     limit: number = 10,
     opt?: AxiosRequestConfig
   ) {
-    return emotionApi.getAllEmotions({
-      userId,
-      limit,
-      sortBy: 'recordedAt',
-      sortOrder: 'desc'
-    }, opt);
+    return emotionApi.getAllEmotions(
+      {
+        userId,
+        limit,
+        sortBy: "recordedAt",
+        sortOrder: "desc",
+      },
+      opt
+    );
   },
 
-  async getTodayEmotions(
-    userId: string,
-    opt?: AxiosRequestConfig
-  ) {
-    return emotionApi.getEmotionsByTimeRange(userId, 'day', opt);
+  async getTodayEmotions(userId: string, opt?: AxiosRequestConfig) {
+    return emotionApi.getEmotionsByTimeRange(userId, "day", opt);
   },
 
-  async getWeekEmotions(
-    userId: string,
-    opt?: AxiosRequestConfig
-  ) {
-    return emotionApi.getEmotionsByTimeRange(userId, 'week', opt);
+  async getWeekEmotions(userId: string, opt?: AxiosRequestConfig) {
+    return emotionApi.getEmotionsByTimeRange(userId, "week", opt);
   },
 
   async getEmotionsByType(
@@ -719,13 +745,16 @@ export const emotionApiHelpers = {
     limit: number = 50,
     opt?: AxiosRequestConfig
   ) {
-    return emotionApi.getAllEmotions({
-      userId,
-      emotion: emotionType,
-      limit,
-      sortBy: 'recordedAt',
-      sortOrder: 'desc'
-    }, opt);
+    return emotionApi.getAllEmotions(
+      {
+        userId,
+        emotion: emotionType,
+        limit,
+        sortBy: "recordedAt",
+        sortOrder: "desc",
+      },
+      opt
+    );
   },
 
   async getEmotionsByIntensity(
@@ -734,13 +763,16 @@ export const emotionApiHelpers = {
     limit: number = 50,
     opt?: AxiosRequestConfig
   ) {
-    return emotionApi.getAllEmotions({
-      userId,
-      intensity,
-      limit,
-      sortBy: 'recordedAt',
-      sortOrder: 'desc'
-    }, opt);
+    return emotionApi.getAllEmotions(
+      {
+        userId,
+        intensity,
+        limit,
+        sortBy: "recordedAt",
+        sortOrder: "desc",
+      },
+      opt
+    );
   },
 
   async getEmotionsByDateRange(
@@ -750,33 +782,36 @@ export const emotionApiHelpers = {
     limit: number = 100,
     opt?: AxiosRequestConfig
   ) {
-    return emotionApi.getAllEmotions({
-      userId,
-      startDate,
-      endDate,
-      limit,
-      sortBy: 'recordedAt',
-      sortOrder: 'desc'
-    }, opt);
+    return emotionApi.getAllEmotions(
+      {
+        userId,
+        startDate,
+        endDate,
+        limit,
+        sortBy: "recordedAt",
+        sortOrder: "desc",
+      },
+      opt
+    );
   },
 
   async getUserEmotionDashboard(
     userId: string,
-    timeRange: string = 'month',
+    timeRange: string = "month",
     opt?: AxiosRequestConfig
   ) {
     const [summary, stats, patterns, recent] = await Promise.all([
       emotionApi.getOverallSummary(userId, timeRange, opt),
       emotionApi.getEmotionStats(userId, { timeRange: timeRange as any }, opt),
       emotionApi.getEmotionPatterns(userId, 30, opt),
-      emotionApiHelpers.getRecentEmotions(userId, 5, opt)
+      emotionApiHelpers.getRecentEmotions(userId, 5, opt),
     ]);
 
     return {
       summary: summary.data,
       stats: stats.data,
       patterns: patterns.data,
-      recent: recent.data
+      recent: recent.data,
     };
-  }
+  },
 };

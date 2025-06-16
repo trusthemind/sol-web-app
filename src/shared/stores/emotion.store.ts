@@ -34,8 +34,11 @@ export type EmotionStoreType = {
   setSelectedValue: (selectedValue: EmotionTypeValue) => void;
   selectedOverallNumber: number;
   setSelectedOverallNumber: (selectedOverallNumber: number) => void;
-  selectedTrigggers: EmotionTriggers | "";
-  setSelectedTriggers: (selectedTriggers: EmotionTriggers) => void;
+  selectedTriggers: EmotionTriggers[];
+  setSelectedTriggers: (selectedTriggers: EmotionTriggers[]) => void;
+  addTrigger: (trigger: EmotionTriggers) => void;
+  removeTrigger: (trigger: EmotionTriggers) => void;
+  toggleTrigger: (trigger: EmotionTriggers) => void;
   adictionalNote: string;
   setAdictionNote: (v: string) => void;
   clearAll: () => void;
@@ -43,16 +46,32 @@ export type EmotionStoreType = {
 
 export const EmotionStore = create<EmotionStoreType>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       step: 0,
       setStep: (v: number) => set({ step: v }),
-      selectedValue: EmotionTypeValue.HAPPY,
+      selectedValue: "",
       setSelectedValue: (selectedValue) => set({ selectedValue }),
       selectedOverallNumber: 0,
       setSelectedOverallNumber: (selectedOverallNumber) =>
         set({ selectedOverallNumber }),
-      selectedTrigggers: EmotionTriggers.WORK_STUDY,
-      setSelectedTriggers: (selectedTrigggers) => set({ selectedTrigggers }),
+      selectedTriggers: [],
+      setSelectedTriggers: (selectedTriggers) => set({ selectedTriggers }),
+      addTrigger: (trigger: EmotionTriggers) =>
+        set((state) => ({
+          selectedTriggers: state.selectedTriggers.includes(trigger)
+            ? state.selectedTriggers
+            : [...state.selectedTriggers, trigger],
+        })),
+      removeTrigger: (trigger: EmotionTriggers) =>
+        set((state) => ({
+          selectedTriggers: state.selectedTriggers.filter((t) => t !== trigger),
+        })),
+      toggleTrigger: (trigger: EmotionTriggers) =>
+        set((state) => ({
+          selectedTriggers: state.selectedTriggers.includes(trigger)
+            ? state.selectedTriggers.filter((t) => t !== trigger)
+            : [...state.selectedTriggers, trigger],
+        })),
       adictionalNote: "",
       setAdictionNote: (adictionalNote) => set({ adictionalNote }),
       clearAll: () =>
@@ -60,7 +79,7 @@ export const EmotionStore = create<EmotionStoreType>()(
           step: 0,
           selectedValue: "",
           selectedOverallNumber: 0,
-          selectedTrigggers: "",
+          selectedTriggers: [],
           adictionalNote: "",
         }),
     }),

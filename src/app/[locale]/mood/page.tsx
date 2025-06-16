@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,25 +27,30 @@ import {
 import MoodStepThree from "@/src/components/mood/MoodStepThree";
 import MoodStepTwo from "@/src/components/mood/MoodStepTwo";
 import MoodStepOne from "@/src/components/mood/MoodStepOne";
+import { ParsedRecommendationData } from "@/src/utils/parseRecommendation";
 
 export default function MoodTrackerRefactored() {
   const { t, locale, isLoading } = useTranslation();
-
   const {
     step,
     setStep,
     selectedValue,
     setSelectedValue,
     selectedOverallNumber,
-    selectedTrigggers,
+    selectedTriggers,
     adictionalNote,
     clearAll,
   } = EmotionStore();
 
   const [selectedMood, setSelectedMood] = useState<any>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [recommendationData, setRecommendationData] =
+    useState<ParsedRecommendationData | null>(null);
 
-  // Mock history data
+  useEffect(() => {
+    if (selectedMood && selectedMood.name) setSelectedValue(selectedMood.name);
+  }, [selectedMood]);
+
   const moodHistory = [
     {
       date: `${t("moodTracker.history.today")}, 9:30 AM`,
@@ -109,7 +114,7 @@ export default function MoodTrackerRefactored() {
     console.log("Saving mood data:", {
       emotion: selectedValue,
       intensity: selectedOverallNumber,
-      triggers: selectedTrigggers,
+      triggers: selectedTriggers,
       note: adictionalNote,
     });
 
@@ -494,7 +499,11 @@ export default function MoodTrackerRefactored() {
                   )}
 
                   {step === 2 && (
-                    <MoodStepTwo onNext={nextStep} onPrev={prevStep} />
+                    <MoodStepTwo
+                      onNext={nextStep}
+                      onPrev={prevStep}
+                      setRecommendationData={setRecommendationData}
+                    />
                   )}
 
                   {step === 3 && (
@@ -502,6 +511,7 @@ export default function MoodTrackerRefactored() {
                       selectedMood={selectedMood}
                       onPrev={prevStep}
                       onSave={handleSave}
+                      recommendationData={recommendationData}
                     />
                   )}
                 </AnimatePresence>

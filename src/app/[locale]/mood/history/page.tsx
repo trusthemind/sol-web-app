@@ -1,14 +1,29 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useState, useMemo, useEffect } from "react";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Badge } from "@/src/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select";
+import { Calendar } from "@/src/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/src/components/ui/popover";
 import {
   ArrowLeft,
   Search,
@@ -21,333 +36,300 @@ import {
   Zap,
   Eye,
   EyeOff,
-} from "lucide-react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
-import timezone from "dayjs/plugin/timezone"
-import relativeTime from "dayjs/plugin/relativeTime"
-import isBetween from "dayjs/plugin/isBetween"
-import isToday from "dayjs/plugin/isToday"
-import isYesterday from "dayjs/plugin/isYesterday"
+  Flame,
+  ZapIcon,
+  Leaf,
+  Search as SearchIcon,
+  Activity,
+  Gauge,
+  AlertTriangle,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import dayjs from "@/src/shared/config/dayjs";
+import EmotionTransformer, { EmotionType } from "@/src/shared/config/emotion";
+import { emotionApi, EmotionsListResponse } from "@/src/shared/api/emotion.api";
+import { useAuth } from "@/src/shared/stores/context/AuthContext";
 
-// Extend dayjs with plugins
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(relativeTime)
-dayjs.extend(isBetween)
-dayjs.extend(isToday)
-dayjs.extend(isYesterday)
-
-// Mock data based on your API structure
-const mockMoodHistory = {
-  success: true,
-  data: [
-    {
-      _id: "684fcd577a7b25afb13ad0ef",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "happy",
-      intensity: "HIGH",
-      triggers: ["Соціальні мережі", "Якість сну"],
-      activities: [],
-      tags: ["medium-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-16T07:52:55.665Z",
-      createdAt: "2025-06-16T07:52:55.760Z",
-      updatedAt: "2025-06-16T07:52:55.760Z",
-      __v: 0,
-      intensityDescription: "High - Strong emotional response",
-    },
-    {
-      _id: "684f3441f48386e215480ad4",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "angry",
-      intensity: "HIGH",
-      triggers: ["Стосунки", "Фінанси", "Робота/Навчання"],
-      activities: [],
-      tags: ["medium-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-15T20:59:45.123Z",
-      createdAt: "2025-06-15T20:59:45.176Z",
-      updatedAt: "2025-06-15T20:59:45.176Z",
-      __v: 0,
-      intensityDescription: "High - Strong emotional response",
-    },
-    {
-      _id: "684f33f2f48386e215480ad2",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "happy",
-      intensity: "HIGH",
-      triggers: ["Погода", "Фізичні вправи", "Якість сну", "Новини"],
-      activities: [],
-      tags: ["high-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-15T20:58:26.464Z",
-      createdAt: "2025-06-15T20:58:26.541Z",
-      updatedAt: "2025-06-15T20:58:26.541Z",
-      __v: 0,
-      intensityDescription: "High - Strong emotional response",
-    },
-    {
-      _id: "684eb6c429e181b30ef75d15",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "happy",
-      intensity: "MODERATE",
-      triggers: ["Соціальні мережі"],
-      activities: [],
-      tags: ["medium-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-15T12:04:20.689Z",
-      createdAt: "2025-06-15T12:04:20.777Z",
-      updatedAt: "2025-06-15T12:04:20.777Z",
-      __v: 0,
-      intensityDescription: "Moderate - Noticeable but manageable",
-    },
-    {
-      _id: "684ead5547df2e2c934ca1a7",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "happy",
-      intensity: "HIGH",
-      triggers: ["Стосунки"],
-      activities: [],
-      tags: ["medium-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-15T11:24:05.048Z",
-      createdAt: "2025-06-15T11:24:05.082Z",
-      updatedAt: "2025-06-15T11:24:05.082Z",
-      __v: 0,
-      intensityDescription: "High - Strong emotional response",
-    },
-    {
-      _id: "684df90c2cd3102b36690fb9",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "excited",
-      intensity: "MODERATE",
-      triggers: ["Стосунки"],
-      activities: [],
-      tags: ["medium-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-14T22:34:52.011Z",
-      createdAt: "2025-06-14T22:34:52.048Z",
-      updatedAt: "2025-06-14T22:34:52.048Z",
-      __v: 0,
-      intensityDescription: "Moderate - Noticeable but manageable",
-    },
-    {
-      _id: "684df8512cd3102b36690fac",
-      userId: {
-        _id: "684db4e25067a32732e5c655",
-        email: "userdev@gmail.com",
-        firstName: "Fedir",
-        lastName: "Melnyk",
-      },
-      emotion: "happy",
-      intensity: "HIGH",
-      triggers: ["Соціальні мережі"],
-      activities: [],
-      tags: ["medium-intensity"],
-      isPrivate: false,
-      recordedAt: "2025-06-14T22:31:45.690Z",
-      createdAt: "2025-06-14T22:31:45.837Z",
-      updatedAt: "2025-06-14T22:31:45.837Z",
-      __v: 0,
-      intensityDescription: "High - Strong emotional response",
-    },
-  ],
-  total: 7,
-  filters: {
-    limit: 10,
-    skip: 0,
-    sortBy: "recordedAt",
-    sortOrder: "desc",
-  },
-}
-
-// Emotion configuration
-const emotionConfig = {
-  happy: {
-    emoji: "😊",
-    color: "from-yellow-400 to-orange-500",
-    bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
-    textColor: "text-yellow-700 dark:text-yellow-300",
-  },
-  excited: {
-    emoji: "🤩",
-    color: "from-purple-400 to-pink-500",
-    bgColor: "bg-purple-100 dark:bg-purple-900/20",
-    textColor: "text-purple-700 dark:text-purple-300",
-  },
-  angry: {
-    emoji: "😠",
-    color: "from-red-500 to-pink-600",
-    bgColor: "bg-red-100 dark:bg-red-900/20",
-    textColor: "text-red-700 dark:text-red-300",
-  },
-  sad: {
-    emoji: "😢",
-    color: "from-blue-400 to-purple-600",
-    bgColor: "bg-blue-100 dark:bg-blue-900/20",
-    textColor: "text-blue-700 dark:text-blue-300",
-  },
-  anxious: {
-    emoji: "😰",
-    color: "from-orange-400 to-red-500",
-    bgColor: "bg-orange-100 dark:bg-orange-900/20",
-    textColor: "text-orange-700 dark:text-orange-300",
-  },
-  neutral: {
-    emoji: "😐",
-    color: "from-gray-400 to-gray-600",
-    bgColor: "bg-gray-100 dark:bg-gray-900/20",
-    textColor: "text-gray-700 dark:text-gray-300",
-  },
+// Updated EmotionFilters interface
+export interface EmotionFilters {
+  userId?: string;
+  emotion?: string | string[];
+  intensity?: number;
+  minIntensity?: number;
+  maxIntensity?: number;
+  stressLevel?: number;
+  minStressLevel?: number;
+  maxStressLevel?: number;
+  timeRange?: "today" | "week" | "month" | "quarter" | "year";
+  startDate?: Date | string;
+  endDate?: Date | string;
+  tags?: string[];
+  triggers?: string[];
+  limit?: number;
+  skip?: number;
+  sortBy?: "createdAt" | "intensity" | "stressLevel" | "emotion";
+  sortOrder?: "asc" | "desc";
 }
 
 const intensityConfig = {
-  HIGH: { label: "High", color: "bg-red-500", icon: "🔥" },
-  MODERATE: { label: "Moderate", color: "bg-yellow-500", icon: "⚡" },
-  LOW: { label: "Low", color: "bg-green-500", icon: "🌱" },
-}
-
-// Helper function to format relative time with more context
-const formatRelativeTime = (dateString: string) => {
-  const date = dayjs(dateString)
-  const now = dayjs()
-
-  if (date.isToday()) {
-    return `Today at ${date.format("h:mm A")}`
-  } else if (date.isYesterday()) {
-    return `Yesterday at ${date.format("h:mm A")}`
-  } else if (now.diff(date, "day") <= 7) {
-    return `${date.format("dddd")} at ${date.format("h:mm A")}`
-  } else {
-    return date.format("MMM DD, YYYY [at] h:mm A")
-  }
-}
+  1: {
+    label: "Very Low",
+    color: "bg-green-200",
+    icon: Leaf,
+    desc: "Barely noticeable",
+  },
+  2: {
+    label: "Low",
+    color: "bg-green-300",
+    icon: Leaf,
+    desc: "Mild emotional response",
+  },
+  3: {
+    label: "Low-Medium",
+    color: "bg-green-400",
+    icon: Leaf,
+    desc: "Slight but noticeable",
+  },
+  4: {
+    label: "Medium-Low",
+    color: "bg-yellow-300",
+    icon: Activity,
+    desc: "Noticeable feeling",
+  },
+  5: {
+    label: "Medium",
+    color: "bg-yellow-400",
+    icon: Activity,
+    desc: "Moderate emotional response",
+  },
+  6: {
+    label: "Medium-High",
+    color: "bg-yellow-500",
+    icon: ZapIcon,
+    desc: "Strong but manageable",
+  },
+  7: {
+    label: "High",
+    color: "bg-orange-400",
+    icon: ZapIcon,
+    desc: "Intense emotional response",
+  },
+  8: {
+    label: "Very High",
+    color: "bg-orange-500",
+    icon: Flame,
+    desc: "Very intense feeling",
+  },
+  9: {
+    label: "Extreme",
+    color: "bg-red-500",
+    icon: Flame,
+    desc: "Overwhelming emotion",
+  },
+  10: {
+    label: "Maximum",
+    color: "bg-red-600",
+    icon: AlertTriangle,
+    desc: "Peak emotional intensity",
+  },
+};
 
 export default function MoodHistory() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedEmotion, setSelectedEmotion] = useState("all")
-  const [selectedIntensity, setSelectedIntensity] = useState("all")
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({})
-  const [showPrivate, setShowPrivate] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEmotion, setSelectedEmotion] = useState<string>("all");
+  const [selectedIntensity, setSelectedIntensity] = useState<string>("all");
+  const [intensityRange, setIntensityRange] = useState<{
+    min?: number;
+    max?: number;
+  }>({});
+  const [selectedTimeRange, setSelectedTimeRange] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<
+    "createdAt" | "intensity" | "stressLevel" | "emotion"
+  >("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const { user } = useAuth();
 
-  // Filter and search logic
+  const userId = user?.id;
+
+  const [moodData, setMoodData] = useState<EmotionsListResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const availableEmotions = useMemo(
+    () => EmotionTransformer.getAllEmotions(),
+    []
+  );
+
+  const getIntensityDescription = (intensity: number) => {
+    const config = intensityConfig[intensity as keyof typeof intensityConfig];
+    return config ? `${config.label} - ${config.desc}` : "Unknown intensity";
+  };
+
+  const formatRelativeTime = (dateString: string) => {
+    const date = dayjs(dateString);
+    const now = dayjs();
+
+    if (date.isSame(now, "day")) return `Today at ${date.format("HH:mm")}`;
+    else if (date.isSame(now.subtract(1, "day"), "day"))
+      return `Yesterday at ${date.format("HH:mm")}`;
+    else if (now.diff(date, "day") <= 7)
+      return `${date.format("dddd")} at ${date.format("HH:mm")}`;
+    else if (date.isSame(now, "year")) return date.format("MMM DD [at] HH:mm");
+    else return date.format("MMM DD, YYYY [at] HH:mm");
+  };
+
+  const formatDisplayDate = (dateString: string) => {
+    return dayjs(dateString).format("MMM DD, YYYY");
+  };
+
+  const formatDisplayTime = (dateString: string) => {
+    return dayjs(dateString).format("HH:mm");
+  };
+
+  const buildFilters = useMemo((): EmotionFilters => {
+    const filters: EmotionFilters = {
+      userId,
+      limit: 50,
+      sortBy,
+      sortOrder,
+    };
+
+    if (selectedEmotion !== "all") filters.emotion = selectedEmotion;
+    else if (intensityRange.min) filters.minIntensity = intensityRange.min;
+    else if (intensityRange.max) filters.maxIntensity = intensityRange.max;
+
+    if (selectedTimeRange !== "all")
+      filters.timeRange = selectedTimeRange as
+        | "today"
+        | "week"
+        | "month"
+        | "quarter"
+        | "year";
+
+    return filters;
+  }, [
+    userId,
+    selectedEmotion,
+    selectedIntensity,
+    intensityRange,
+    selectedTimeRange,
+    sortBy,
+    sortOrder,
+    searchTerm,
+  ]);
+
+  useEffect(() => {
+    const fetchMoodHistory = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await emotionApi.getAllEmotions(buildFilters);
+        setMoodData(response.data);
+      } catch (err) {
+        console.error("Error fetching mood history:", err);
+        setError("Failed to load mood history. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMoodHistory();
+  }, [buildFilters]);
+
   const filteredData = useMemo(() => {
-    let filtered = mockMoodHistory.data
+    if (!moodData?.data) return [];
 
-    // Search filter
+    let filtered = moodData.data;
+
     if (searchTerm) {
       filtered = filtered.filter(
         (entry) =>
           entry.emotion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.triggers.some((trigger) => trigger.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          entry.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase())),
-      )
+          (entry.triggers &&
+            entry.triggers.some((trigger) =>
+              trigger.toLowerCase().includes(searchTerm.toLowerCase())
+            )) ||
+          (entry.tags &&
+            entry.tags.some((tag) =>
+              tag.toLowerCase().includes(searchTerm.toLowerCase())
+            ))
+      );
     }
 
-    // Emotion filter
-    if (selectedEmotion !== "all") {
-      filtered = filtered.filter((entry) => entry.emotion === selectedEmotion)
-    }
+    return filtered;
+  }, [moodData?.data, searchTerm]);
 
-    // Intensity filter
-    if (selectedIntensity !== "all") {
-      filtered = filtered.filter((entry) => entry.intensity === selectedIntensity)
-    }
-
-    // Date range filter using dayjs
-    if (dateRange.from && dateRange.to) {
-      const fromDate = dayjs(dateRange.from).startOf("day")
-      const toDate = dayjs(dateRange.to).endOf("day")
-
-      filtered = filtered.filter((entry) => {
-        const entryDate = dayjs(entry.recordedAt)
-        return entryDate.isBetween(fromDate, toDate, null, "[]")
-      })
-    }
-
-    // Privacy filter
-    if (!showPrivate) {
-      filtered = filtered.filter((entry) => !entry.isPrivate)
-    }
-
-    return filtered
-  }, [searchTerm, selectedEmotion, selectedIntensity, dateRange, showPrivate])
-
-  // Statistics
   const stats = useMemo(() => {
-    const emotions = filteredData.reduce(
-      (acc, entry) => {
-        acc[entry.emotion] = (acc[entry.emotion] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
+    const emotions = filteredData.reduce((acc, entry) => {
+      const normalizedEmotion = EmotionTransformer.normalizeEmotion(
+        entry.emotion
+      );
+      acc[normalizedEmotion] = (acc[normalizedEmotion] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-    const intensities = filteredData.reduce(
-      (acc, entry) => {
-        acc[entry.intensity] = (acc[entry.intensity] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
+    const intensities = filteredData.reduce((acc, entry) => {
+      acc[entry.intensity] = (acc[entry.intensity] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+
+    const avgIntensity =
+      filteredData.length > 0
+        ? filteredData.reduce((sum, entry) => sum + entry.intensity, 0) /
+          filteredData.length
+        : 0;
 
     const topTriggers = filteredData
-      .flatMap((entry) => entry.triggers)
-      .reduce(
-        (acc, trigger) => {
-          acc[trigger] = (acc[trigger] || 0) + 1
-          return acc
-        },
-        {} as Record<string, number>,
-      )
+      .flatMap((entry) => entry.triggers || [])
+      .reduce((acc, trigger) => {
+        acc[trigger] = (acc[trigger] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
     return {
       totalEntries: filteredData.length,
       emotions,
       intensities,
+      avgIntensity: Math.round(avgIntensity * 10) / 10,
       topTriggers: Object.entries(topTriggers)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 5),
-    }
-  }, [filteredData])
+    };
+  }, [filteredData]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-xl mb-4">⚠️</div>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -355,90 +337,115 @@ export default function MoodHistory() {
         >
           <div className="flex items-center space-x-4">
             <Link href="/mood-tracker">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="hover:bg-gray-100">
+                <ArrowLeft className="h-4 w-4 text-gray-700" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold">Mood History</h1>
-              <p className="text-muted-foreground">Track your emotional journey over time</p>
+              <h1 className="text-3xl font-bold text-gray-900">Mood History</h1>
+              <p className="text-gray-600">
+                Track your emotional journey over time
+              </p>
             </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button variant="outline">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button variant="outline">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Export
-            </Button>
           </div>
         </motion.div>
 
-        {/* Stats Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
         >
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Entries</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-gray-700">
+                Total Entries
+              </CardTitle>
+              <BarChart3 className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalEntries}</div>
-              <p className="text-xs text-muted-foreground">{mockMoodHistory.total} total records</p>
+              <div className="text-2xl font-bold text-gray-900">
+                {stats.totalEntries}
+              </div>
+              <p className="text-xs text-gray-500">
+                {moodData?.total || 0} total records
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Most Common</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-700">
+                Most Common
+              </CardTitle>
               <div className="text-lg">
                 {Object.entries(stats.emotions).length > 0 &&
-                  emotionConfig[
-                    Object.entries(stats.emotions).sort(([, a], [, b]) => b - a)[0][0] as keyof typeof emotionConfig
-                  ]?.emoji}
+                  (() => {
+                    const mostCommonEmotion = Object.entries(
+                      stats.emotions
+                    ).sort(([, a], [, b]) => b - a)[0][0] as EmotionType;
+                    const emotionIcon =
+                      EmotionTransformer.getEmotionIcon(mostCommonEmotion);
+                    return emotionIcon ? (
+                      <Image
+                        src={emotionIcon}
+                        alt={mostCommonEmotion}
+                        width={16}
+                        height={16}
+                        className="text-gray-600"
+                      />
+                    ) : null;
+                  })()}
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold capitalize">
+              <div className="text-2xl font-bold text-gray-900 capitalize">
                 {Object.entries(stats.emotions).length > 0 &&
-                  Object.entries(stats.emotions).sort(([, a], [, b]) => b - a)[0][0]}
+                  Object.entries(stats.emotions).sort(
+                    ([, a], [, b]) => b - a
+                  )[0][0]}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-500">
                 {Object.entries(stats.emotions).length > 0 &&
-                  Object.entries(stats.emotions).sort(([, a], [, b]) => b - a)[0][1]}{" "}
+                  Object.entries(stats.emotions).sort(
+                    ([, a], [, b]) => b - a
+                  )[0][1]}{" "}
                 times recorded
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Intensity</CardTitle>
-              <Zap className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-gray-700">
+                Avg Intensity
+              </CardTitle>
+              <Gauge className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {Object.entries(stats.intensities).length > 0 &&
-                  Object.entries(stats.intensities).sort(([, a], [, b]) => b - a)[0][0]}
+              <div className="text-2xl font-bold text-gray-900">
+                {stats.avgIntensity}/10
               </div>
-              <p className="text-xs text-muted-foreground">Most frequent level</p>
+              <p className="text-xs text-gray-500">
+                Average emotional intensity
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Top Trigger</CardTitle>
-              <Tag className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-gray-700">
+                Top Trigger
+              </CardTitle>
+              <Tag className="h-4 w-4 text-gray-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.topTriggers[0]?.[1] || 0}</div>
-              <p className="text-xs text-muted-foreground">{stats.topTriggers[0]?.[0] || "No triggers"}</p>
+              <div className="text-2xl font-bold text-gray-900">
+                {stats.topTriggers[0]?.[1] || 0}
+              </div>
+              <p className="text-xs text-gray-500">
+                {stats.topTriggers[0]?.[0] || "No triggers"}
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -451,165 +458,213 @@ export default function MoodHistory() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-1"
           >
-            <Card className="sticky top-4">
+            <Card className="sticky top-4 bg-white border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Filter className="h-5 w-5 mr-2" />
+                <CardTitle className="flex items-center text-gray-900">
+                  <Filter className="h-5 w-5 mr-2 text-gray-600" />
                   Filters
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Search */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Search</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Search
+                  </label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       placeholder="Search emotions, triggers..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
                 </div>
 
                 {/* Emotion Filter */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Emotion</label>
-                  <Select value={selectedEmotion} onValueChange={setSelectedEmotion}>
-                    <SelectTrigger>
+                  <label className="text-sm font-medium text-gray-700">
+                    Emotion
+                  </label>
+                  <Select
+                    value={selectedEmotion}
+                    onValueChange={setSelectedEmotion}
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                       <SelectValue placeholder="All emotions" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All emotions</SelectItem>
-                      {Object.keys(emotionConfig).map((emotion) => (
-                        <SelectItem key={emotion} value={emotion}>
-                          <div className="flex items-center space-x-2">
-                            <span>{emotionConfig[emotion as keyof typeof emotionConfig].emoji}</span>
-                            <span className="capitalize">{emotion}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                    <SelectContent className="bg-white border-gray-200">
+                      <SelectItem value="all" className="text-gray-700">
+                        All emotions
+                      </SelectItem>
+                      {availableEmotions.map((emotion) => {
+                        return (
+                          <SelectItem
+                            key={emotion.value}
+                            value={emotion.value}
+                            className="text-gray-700"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <Image
+                                src={emotion.icon}
+                                alt={emotion.label}
+                                width={16}
+                                height={16}
+                              />
+                              <span className="capitalize">
+                                {emotion.label}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Intensity Filter */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Intensity</label>
-                  <Select value={selectedIntensity} onValueChange={setSelectedIntensity}>
-                    <SelectTrigger>
+                  <label className="text-sm font-medium text-gray-700">
+                    Intensity
+                  </label>
+                  <Select
+                    value={selectedIntensity}
+                    onValueChange={setSelectedIntensity}
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                       <SelectValue placeholder="All intensities" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All intensities</SelectItem>
-                      {Object.entries(intensityConfig).map(([key, config]) => (
-                        <SelectItem key={key} value={key}>
-                          <div className="flex items-center space-x-2">
-                            <span>{config.icon}</span>
-                            <span>{config.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                    <SelectContent className="bg-white border-gray-200">
+                      <SelectItem value="all" className="text-gray-700">
+                        All intensities
+                      </SelectItem>
+                      {Object.entries(intensityConfig).map(([key, config]) => {
+                        const IconComponent = config.icon;
+                        return (
+                          <SelectItem
+                            key={key}
+                            value={key}
+                            className="text-gray-700"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <IconComponent className="h-4 w-4 text-gray-600" />
+                              <span>
+                                {key} - {config.label}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Date Range */}
+                {/* Time Range Filter */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Date Range</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left font-normal">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange.from ? (
-                          dateRange.to ? (
-                            <>
-                              {dayjs(dateRange.from).format("MMM DD, YYYY")} -{" "}
-                              {dayjs(dateRange.to).format("MMM DD, YYYY")}
-                            </>
-                          ) : (
-                            dayjs(dateRange.from).format("MMM DD, YYYY")
-                          )
-                        ) : (
-                          <span>Pick a date range</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={dateRange.from}
-                        // selected={dateRange}
-                        // onSelect={setDateRange}
-                        numberOfMonths={2}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <label className="text-sm font-medium text-gray-700">
+                    Time Range
+                  </label>
+                  <Select
+                    value={selectedTimeRange}
+                    onValueChange={setSelectedTimeRange}
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue placeholder="All time" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-gray-200">
+                      <SelectItem value="all" className="text-gray-700">
+                        All time
+                      </SelectItem>
+                      <SelectItem value="today" className="text-gray-700">
+                        Today
+                      </SelectItem>
+                      <SelectItem value="week" className="text-gray-700">
+                        This week
+                      </SelectItem>
+                      <SelectItem value="month" className="text-gray-700">
+                        This month
+                      </SelectItem>
+                      <SelectItem value="quarter" className="text-gray-700">
+                        This quarter
+                      </SelectItem>
+                      <SelectItem value="year" className="text-gray-700">
+                        This year
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Privacy Toggle */}
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Show Private</label>
-                  <Button variant="ghost" size="sm" onClick={() => setShowPrivate(!showPrivate)}>
-                    {showPrivate ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                  </Button>
+                {/* Sort Options */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Sort By
+                  </label>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(value) => setSortBy(value as typeof sortBy)}
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-gray-200">
+                      <SelectItem value="createdAt" className="text-gray-700">
+                        Date Created
+                      </SelectItem>
+                      <SelectItem value="intensity" className="text-gray-700">
+                        Intensity
+                      </SelectItem>
+                      <SelectItem value="emotion" className="text-gray-700">
+                        Emotion
+                      </SelectItem>
+                      <SelectItem value="stressLevel" className="text-gray-700">
+                        Stress Level
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Quick Filters */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Quick Filters</label>
-                  <div className="space-y-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() =>
-                        setDateRange({
-                          from: dayjs().subtract(7, "day").toDate(),
-                          to: dayjs().toDate(),
-                        })
-                      }
-                    >
-                      Last 7 days
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() =>
-                        setDateRange({
-                          from: dayjs().subtract(30, "day").toDate(),
-                          to: dayjs().toDate(),
-                        })
-                      }
-                    >
-                      Last 30 days
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() =>
-                        setDateRange({
-                          from: dayjs().subtract(3, "month").toDate(),
-                          to: dayjs().toDate(),
-                        })
-                      }
-                    >
-                      Last 3 months
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start"
-                      onClick={() => setDateRange({})}
-                    >
-                      Clear dates
-                    </Button>
-                  </div>
+                  <label className="text-sm font-medium text-gray-700">
+                    Sort Order
+                  </label>
+                  <Select
+                    value={sortOrder}
+                    onValueChange={(value) =>
+                      setSortOrder(value as typeof sortOrder)
+                    }
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-gray-200">
+                      <SelectItem value="desc" className="text-gray-700">
+                        Descending
+                      </SelectItem>
+                      <SelectItem value="asc" className="text-gray-700">
+                        Ascending
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                {/* Clear Filters */}
+                <Button
+                  variant="outline"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedEmotion("all");
+                    setSelectedIntensity("all");
+                    setSelectedTimeRange("all");
+
+                    setIntensityRange({});
+                    setSortBy("createdAt");
+                    setSortOrder("desc");
+                  }}
+                >
+                  Clear All Filters
+                </Button>
               </CardContent>
             </Card>
           </motion.div>
@@ -624,26 +679,25 @@ export default function MoodHistory() {
             <div className="space-y-6">
               {/* Results Header */}
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">
-                  {filteredData.length} {filteredData.length === 1 ? "Entry" : "Entries"} Found
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {filteredData.length}{" "}
+                  {filteredData.length === 1 ? "Entry" : "Entries"} Found
                 </h2>
-                <Select defaultValue="recordedAt">
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="recordedAt">Most Recent</SelectItem>
-                    <SelectItem value="emotion">Emotion</SelectItem>
-                    <SelectItem value="intensity">Intensity</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               {/* Mood Entries */}
               <div className="space-y-4">
                 {filteredData.map((entry, index) => {
-                  const emotion = emotionConfig[entry.emotion as keyof typeof emotionConfig]
-                  const intensity = intensityConfig[entry.intensity as keyof typeof intensityConfig]
+                  const emotionConfig = EmotionTransformer.getEmotionConfig(
+                    entry.emotion
+                  );
+                  const intensity =
+                    intensityConfig[
+                      entry.intensity as keyof typeof intensityConfig
+                    ];
+
+                  const emotionIcon = emotionConfig.icon;
+                  const IntensityIcon = intensity?.icon;
 
                   return (
                     <motion.div
@@ -652,53 +706,88 @@ export default function MoodHistory() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 * index }}
                     >
-                      <Card className="hover:shadow-md transition-shadow">
+                      <Card className="hover:shadow-md transition-shadow bg-white border-gray-200">
                         <CardContent className="p-6">
                           <div className="flex items-start space-x-4">
                             {/* Emotion Icon */}
                             <div
-                              className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${emotion?.bgColor}`}
+                              className={`w-16 h-16 rounded-full flex items-center justify-center ${emotionConfig.bgColor}`}
                             >
-                              {emotion?.emoji}
+                              <Image
+                                src={emotionIcon}
+                                alt={EmotionTransformer.normalizeEmotion(
+                                  entry.emotion
+                                )}
+                                width={32}
+                                height={32}
+                                className={emotionConfig.textColor}
+                              />
                             </div>
 
                             {/* Main Content */}
                             <div className="flex-1 space-y-3">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
-                                  <h3 className="text-lg font-semibold capitalize">{entry.emotion}</h3>
-                                  <Badge variant="secondary" className={`${intensity?.color} text-white`}>
-                                    {intensity?.icon} {intensity?.label}
+                                  <h3 className="text-lg font-semibold capitalize text-gray-900">
+                                    {EmotionTransformer.normalizeEmotion(
+                                      entry.emotion
+                                    )}
+                                  </h3>
+                                  <Badge
+                                    variant="secondary"
+                                    className={`${intensity?.color} text-white flex items-center space-x-1`}
+                                  >
+                                    {IntensityIcon && (
+                                      <IntensityIcon className="h-3 w-3" />
+                                    )}
+                                    <span>{entry.intensity}/10</span>
                                   </Badge>
-                                  {entry.isPrivate && (
-                                    <Badge variant="outline">
-                                      <EyeOff className="h-3 w-3 mr-1" />
-                                      Private
-                                    </Badge>
-                                  )}
                                 </div>
                                 <div className="text-right">
-                                  <div className="text-sm font-medium">
-                                    {dayjs(entry.recordedAt).format("MMM DD, YYYY")}
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {formatDisplayDate(
+                                      entry.createdAt?.toString() || ""
+                                    )}
                                   </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {dayjs(entry.recordedAt).format("h:mm A")}
+                                  <div className="text-xs text-gray-500">
+                                    {formatDisplayTime(
+                                      entry.createdAt?.toString() || ""
+                                    )}
                                   </div>
                                 </div>
                               </div>
 
-                              <p className="text-sm text-muted-foreground">{entry.intensityDescription}</p>
+                              <p className="text-sm text-gray-600">
+                                {entry.description ||
+                                  getIntensityDescription(entry.intensity)}
+                              </p>
+
+                              {/* Stress Level (if available) */}
+                              {entry.stressLevel && (
+                                <div className="flex items-center space-x-2">
+                                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                                  <span className="text-sm text-gray-700">
+                                    Stress Level: {entry.stressLevel}/10
+                                  </span>
+                                </div>
+                              )}
 
                               {/* Triggers */}
-                              {entry.triggers.length > 0 && (
+                              {entry.triggers && entry.triggers.length > 0 && (
                                 <div className="space-y-2">
                                   <div className="flex items-center space-x-2">
-                                    <Tag className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm font-medium">Triggers:</span>
+                                    <Tag className="h-4 w-4 text-gray-500" />
+                                    <span className="text-sm font-medium text-gray-700">
+                                      Triggers:
+                                    </span>
                                   </div>
                                   <div className="flex flex-wrap gap-2">
                                     {entry.triggers.map((trigger, idx) => (
-                                      <Badge key={idx} variant="outline" className="text-xs">
+                                      <Badge
+                                        key={idx}
+                                        variant="outline"
+                                        className="text-xs border-gray-300 text-gray-600"
+                                      >
                                         {trigger}
                                       </Badge>
                                     ))}
@@ -707,30 +796,27 @@ export default function MoodHistory() {
                               )}
 
                               {/* Tags */}
-                              {entry.tags.length > 0 && (
+                              {entry.tags && entry.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-2">
                                   {entry.tags.map((tag, idx) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                    <Badge
+                                      key={idx}
+                                      variant="secondary"
+                                      className="text-xs bg-gray-100 text-gray-700"
+                                    >
                                       #{tag}
                                     </Badge>
                                   ))}
                                 </div>
                               )}
 
-                              {/* User Info */}
-                              <div className="flex items-center space-x-2 pt-2 border-t">
-                                <Avatar className="w-6 h-6">
-                                  <AvatarFallback className="text-xs">
-                                    {entry.userId.firstName[0]}
-                                    {entry.userId.lastName[0]}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-xs text-muted-foreground">
-                                  {entry.userId.firstName} {entry.userId.lastName}
-                                </span>
-                                <Clock className="h-3 w-3 text-muted-foreground ml-auto" />
-                                <span className="text-xs text-muted-foreground">
-                                  {formatRelativeTime(entry.createdAt)}
+                              {/* Entry Info */}
+                              <div className="flex items-center space-x-2 pt-2 border-t border-gray-200">
+                                <Clock className="h-3 w-3 text-gray-400" />
+                                <span className="text-xs text-gray-500">
+                                  {formatRelativeTime(
+                                    entry.createdAt?.toString() || ""
+                                  )}
                                 </span>
                               </div>
                             </div>
@@ -738,23 +824,37 @@ export default function MoodHistory() {
                         </CardContent>
                       </Card>
                     </motion.div>
-                  )
+                  );
                 })}
               </div>
 
               {/* No Results */}
               {filteredData.length === 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold mb-2">No entries found</h3>
-                  <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms</p>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
+                >
+                  <div className="text-6xl mb-4">
+                    <SearchIcon className="w-16 h-16 text-gray-300 mx-auto" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                    No entries found
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Try adjusting your filters or search terms
+                  </p>
                   <Button
                     variant="outline"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
                     onClick={() => {
-                      setSearchTerm("")
-                      setSelectedEmotion("all")
-                      setSelectedIntensity("all")
-                      setDateRange({})
+                      setSearchTerm("");
+                      setSelectedEmotion("all");
+                      setSelectedIntensity("all");
+                      setSelectedTimeRange("all");
+                      setIntensityRange({});
+                      setSortBy("createdAt");
+                      setSortOrder("desc");
                     }}
                   >
                     Clear all filters
@@ -763,15 +863,45 @@ export default function MoodHistory() {
               )}
 
               {/* Load More */}
-              {filteredData.length > 0 && filteredData.length < mockMoodHistory.total && (
-                <div className="text-center pt-6">
-                  <Button variant="outline">Load More Entries</Button>
-                </div>
-              )}
+              {filteredData.length > 0 &&
+                moodData &&
+                filteredData.length < moodData.total && (
+                  <div className="text-center pt-6">
+                    <Button
+                      variant="outline"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                      onClick={async () => {
+                        try {
+                          const newFilters = {
+                            ...buildFilters,
+                            skip: moodData.data.length,
+                          };
+
+                          const response = await emotionApi.getAllEmotions(
+                            newFilters
+                          );
+
+                          setMoodData((prev) =>
+                            prev
+                              ? {
+                                  ...response.data,
+                                  data: [...prev.data, ...response.data.data],
+                                }
+                              : response.data
+                          );
+                        } catch (err) {
+                          console.error("Error loading more entries:", err);
+                        }
+                      }}
+                    >
+                      Load More Entries
+                    </Button>
+                  </div>
+                )}
             </div>
           </motion.div>
         </div>
       </div>
     </div>
-  )
+  );
 }

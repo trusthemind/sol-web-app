@@ -91,11 +91,9 @@ const achievements = [
 
 export default function Dashboard() {
   const { t, locale, isLoading } = useTranslation();
-  const [selectedPeriod, setSelectedPeriod] = useState("week");
   const [selectedMetric, setSelectedMetric] = useState("mood");
   const { user } = useAuth();
 
-  // Localized day abbreviations
   const localizedDayData = moodData.map((item) => ({
     ...item,
     day:

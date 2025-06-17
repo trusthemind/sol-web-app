@@ -9,12 +9,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+} from "@/src/components/ui/dialog";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { Button } from "@/src/components/ui/button";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { Separator } from "@/src/components/ui/separator";
 import { AlertTriangle, Trash2, X, ShieldAlert } from "lucide-react";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import {

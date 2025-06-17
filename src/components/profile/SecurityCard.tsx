@@ -6,9 +6,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+} from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { Separator } from "@/src/components/ui/separator";
 import { Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AppRoutes } from "../../shared/constants/navigation";

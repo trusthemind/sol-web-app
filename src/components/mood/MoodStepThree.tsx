@@ -24,6 +24,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/src/shared/stores/context/AuthContext";
 import { ParsedRecommendationData } from "@/src/utils/parseRecommendation";
 import { RecommendationCard } from "../ui/RecomendationCard";
+import { AppRoutes } from "@/src/shared/constants/navigation";
+import { useRouter } from "next/navigation";
 
 interface MoodStepThreeProps {
   selectedMood: any;
@@ -49,6 +51,7 @@ export default function MoodStepThree({
 
   const [isLoading, setIsLoading] = useState(false);
   const [streakInfo, setStreakInfo] = useState<any>(null);
+  const { push } = useRouter();
 
   const handleSaveEmotion = async () => {
     if (!user?.id) {
@@ -101,6 +104,7 @@ export default function MoodStepThree({
 
         setTimeout(() => {
           resetStore();
+          push(AppRoutes.DASHBOARD);
         }, 5 * 1000);
       } else {
         throw new Error("Failed to save emotion");

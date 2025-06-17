@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
+import { Button } from "@/src/components/ui/button";
 import { Camera, X } from "lucide-react";
-import { useAvatarUpload } from "../hooks/useAvatar";
 import { UserData } from "../types/Api.type";
+import { useAvatarUpload } from "../hooks/useAvatarUpload";
 
 interface ProfileAvatarContainerProps {
   user: UserData;

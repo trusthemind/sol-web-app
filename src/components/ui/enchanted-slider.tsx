@@ -1,34 +1,38 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as SliderPrimitive from "@radix-ui/react-slider"
-import { motion, useMotionValue, useTransform } from "framer-motion"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { cn } from "@/src/lib/utils";
 
-interface EnhancedSliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
-  moodColor?: string
-  glowEffect?: boolean
+interface EnhancedSliderProps
+  extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
+  moodColor?: string;
+  glowEffect?: boolean;
 }
 
 const EnhancedSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   EnhancedSliderProps
 >(({ className, moodColor = "white", glowEffect = true, ...props }, ref) => {
-  const [isDragging, setIsDragging] = React.useState(false)
-  const progress = useMotionValue(0)
-  const scale = useTransform(progress, [0, 100], [1, 1.1])
-  const glow = useTransform(progress, [0, 100], [0, 20])
+  const [isDragging, setIsDragging] = React.useState(false);
+  const progress = useMotionValue(0);
+  const scale = useTransform(progress, [0, 100], [1, 1.1]);
+  const glow = useTransform(progress, [0, 100], [0, 20]);
 
   React.useEffect(() => {
     if (props.value) {
-      progress.set((props.value[0] / (props.max || 10)) * 100)
+      progress.set((props.value[0] / (props.max || 10)) * 100);
     }
-  }, [props.value, props.max, progress])
+  }, [props.value, props.max, progress]);
 
   return (
     <SliderPrimitive.Root
       ref={ref}
-      className={cn("relative flex w-full touch-none select-none items-center group", className)}
+      className={cn(
+        "relative flex w-full touch-none select-none items-center group",
+        className
+      )}
       onPointerDown={() => setIsDragging(true)}
       onPointerUp={() => setIsDragging(false)}
       {...props}
@@ -39,16 +43,19 @@ const EnhancedSlider = React.forwardRef<
           className="absolute h-full bg-gradient-to-r from-white/60 to-white/80 rounded-full"
           style={{
             width: `${((props.value?.[0] || 0) / (props.max || 10)) * 100}%`,
-            boxShadow: glowEffect ? `0 0 ${glow.get()}px rgba(255,255,255,0.6)` : undefined,
+            boxShadow: glowEffect
+              ? `0 0 ${glow.get()}px rgba(255,255,255,0.6)`
+              : undefined,
           }}
           animate={{
-            boxShadow: isDragging && glowEffect 
-              ? `0 0 25px rgba(255,255,255,0.8), 0 0 50px rgba(255,255,255,0.4)`
-              : `0 0 10px rgba(255,255,255,0.3)`,
+            boxShadow:
+              isDragging && glowEffect
+                ? `0 0 25px rgba(255,255,255,0.8), 0 0 50px rgba(255,255,255,0.4)`
+                : `0 0 10px rgba(255,255,255,0.3)`,
           }}
           transition={{ duration: 0.2 }}
         />
-        
+
         {glowEffect && (
           <div className="absolute inset-0 overflow-hidden rounded-full">
             {[...Array(3)].map((_, i) => (
@@ -56,7 +63,9 @@ const EnhancedSlider = React.forwardRef<
                 key={i}
                 className="absolute w-1 h-1 bg-white/80 rounded-full"
                 style={{
-                  left: `${((props.value?.[0] || 0) / (props.max || 10)) * 100}%`,
+                  left: `${
+                    ((props.value?.[0] || 0) / (props.max || 10)) * 100
+                  }%`,
                   top: "50%",
                   transform: "translateY(-50%)",
                 }}
@@ -82,7 +91,7 @@ const EnhancedSlider = React.forwardRef<
           style={{ scale }}
           animate={{
             scale: isDragging ? 1.3 : 1,
-            boxShadow: isDragging 
+            boxShadow: isDragging
               ? "0 0 20px rgba(255,255,255,0.8), 0 4px 20px rgba(0,0,0,0.3)"
               : "0 2px 10px rgba(0,0,0,0.2)",
           }}
@@ -120,9 +129,9 @@ const EnhancedSlider = React.forwardRef<
         <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white/20" />
       </motion.div>
     </SliderPrimitive.Root>
-  )
-})
+  );
+});
 
-EnhancedSlider.displayName = "EnhancedSlider"
+EnhancedSlider.displayName = "EnhancedSlider";
 
-export { EnhancedSlider }
+export { EnhancedSlider };

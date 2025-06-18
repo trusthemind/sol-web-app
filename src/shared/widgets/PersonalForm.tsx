@@ -7,10 +7,10 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+} from "@/src/components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { Button } from "@/src/components/ui/button";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
 import { useProfile, useProfileUpdate } from "@/src/shared/hooks/useProfile";
 import {
@@ -28,7 +28,7 @@ interface PersonalInfoFormProps {
 export const PersonalInfoForm = ({ user: propUser }: PersonalInfoFormProps) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
-  
+
   const { user: hookUser, refetch } = useProfile();
   const user = propUser || hookUser;
 
@@ -111,7 +111,7 @@ export const PersonalInfoForm = ({ user: propUser }: PersonalInfoFormProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First Name */}
             <div className="space-y-3">
@@ -187,7 +187,6 @@ export const PersonalInfoForm = ({ user: propUser }: PersonalInfoFormProps) => {
                 errors.phone ? "border-red-400 focus:border-red-400" : ""
               }`}
             />
-
           </div>
 
           {/* Action Buttons */}

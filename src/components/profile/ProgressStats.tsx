@@ -1,13 +1,18 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
 
 interface ProgressStatsProps {
-  title: string
+  title: string;
   stats: {
-    label: string
-    value: string | number
-  }[]
+    label: string;
+    value: string | number;
+  }[];
 }
 
 export function ProgressStats({ title, stats }: ProgressStatsProps) {
@@ -25,5 +30,5 @@ export function ProgressStats({ title, stats }: ProgressStatsProps) {
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }

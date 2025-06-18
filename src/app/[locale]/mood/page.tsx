@@ -166,41 +166,7 @@ export default function MoodTrackerRefactored() {
     }, 300);
   };
 
-  const handleSave = async () => {
-    if (!user?.id) return;
 
-    try {
-      const emotionData = {
-        userId: user.id,
-        emotion: selectedValue,
-        intensity: selectedOverallNumber,
-        triggers: selectedTriggers,
-        description: adictionalNote,
-      };
-
-      await emotionApi.createEmotion(emotionData);
-
-      // Оновлюємо дані після збереження
-      const [emotionsRes, streakRes] = await Promise.all([
-        emotionApi.getAllEmotions({
-          userId: user.id,
-          limit: 5,
-          sortBy: "createdAt",
-          sortOrder: "desc",
-        }),
-        streakApi.getUserStreak(user.id),
-      ]);
-
-      setRecentEmotions(emotionsRes.data.data || []);
-      setStreakData(streakRes.data.data as StreakData);
-
-      setTimeout(() => {
-        window.location.href = `/${locale}/dashboard`;
-      }, 1000);
-    } catch (error) {
-      console.error("Error saving emotion:", error);
-    }
-  };
 
   const nextStep = () => {
     setStep(step + 1);
@@ -613,7 +579,6 @@ export default function MoodTrackerRefactored() {
                     <MoodStepThree
                       selectedMood={selectedMood}
                       onPrev={prevStep}
-                      onSave={handleSave}
                       recommendationData={recommendationData}
                     />
                   )}

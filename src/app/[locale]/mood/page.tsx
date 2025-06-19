@@ -38,6 +38,7 @@ import {
 } from "@/src/shared/api/emotion.api";
 import { useAuth } from "@/src/shared/stores/context/AuthContext";
 import Image from "next/image";
+import { LoadingSpinner } from "@/src/components/LoadingSpinner";
 
 interface RecentEmotion {
   _id: string;
@@ -70,7 +71,6 @@ export default function MoodTrackerRefactored() {
   } = EmotionStore();
 
   const [selectedMood, setSelectedMood] = useState<any>(null);
-  const [showHistory, setShowHistory] = useState(false);
   const [recentEmotions, setRecentEmotions] = useState<EmotionData[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
@@ -166,8 +166,6 @@ export default function MoodTrackerRefactored() {
     }, 300);
   };
 
-
-
   const nextStep = () => {
     setStep(step + 1);
   };
@@ -214,22 +212,7 @@ export default function MoodTrackerRefactored() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <motion.div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 1,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-          />
-          <p className="text-gray-600">{t("common.loading")}</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -281,121 +264,12 @@ export default function MoodTrackerRefactored() {
                   </div>
                 </motion.div>
               )}
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center border-2 gap-2 border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
-              >
-                <Clock className="h-4 w-4" />
-                {showHistory
-                  ? t("moodTracker.hideHistory")
-                  : t("moodTracker.showHistory")}
-              </Button>
             </div>
           </div>
         </div>
       </motion.div>
 
       <div className="container mx-auto px-4 py-8 mt-4">
-        {/* Mood History */}
-        <AnimatePresence>
-          {showHistory && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, y: -20 }}
-              animate={{ opacity: 1, height: "auto", y: 0 }}
-              exit={{ opacity: 0, height: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="mb-8 overflow-hidden"
-            >
-              <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <motion.h3
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="font-semibold mb-4 flex items-center text-gray-900"
-                  >
-                    <Calendar className="h-5 w-5 mr-2 text-blue-500" />
-                    {t("moodTracker.recentEntries")}
-                  </motion.h3>
-
-                  {isLoadingData ? (
-                    <div className="flex justify-center py-8">
-                      <motion.div
-                        className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: "linear",
-                        }}
-                      />
-                    </div>
-                  ) : recentEmotions.length > 0 ? (
-                    <div className="space-y-3">
-                      {recentEmotions.map((emotion, i) => {
-                        const EmotionIcon = getEmotionIcon(emotion.emotion);
-                        const emotionColor = getEmotionColor(emotion.emotion);
-
-                        return (
-                          <motion.div
-                            key={emotion._id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200"
-                          >
-                            <div className="flex items-center gap-4">
-                              <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                className={`p-2 rounded-full bg-white ${emotionColor}`}
-                              >
-                                <EmotionIcon className="h-5 w-5" />
-                              </motion.div>
-                              <div>
-                                <p className="font-medium text-gray-900">
-                                  {emotion.emotionUkrainian || emotion.emotion}
-                                </p>
-                                {emotion.description && (
-                                  <p className="text-xs text-gray-400 mt-1">
-                                    {emotion.description.slice(0, 50)}...
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="text-sm font-medium text-gray-700">
-                                {t("moodTracker.intensity")}
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                              >
-                                {t("moodTracker.view")}
-                              </Button>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>{t("moodTracker.noEntries")}</p>
-                      <p className="text-sm mt-2">
-                        {t("moodTracker.startTracking")}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Enhanced Mood Grid */}
         <AnimatePresence>
           {!selectedMood && (
             <motion.div

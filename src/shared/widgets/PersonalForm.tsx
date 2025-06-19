@@ -44,7 +44,7 @@ export const PersonalInfoForm = ({ user: propUser }: PersonalInfoFormProps) => {
     reset,
     watch,
   } = useForm<UpdateProfileFormData>({
-    resolver: yupResolver(updateProfileSchema),
+    resolver: yupResolver(updateProfileSchema) as any,
     defaultValues: {
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",

@@ -13,9 +13,7 @@ import {
 } from "@/src/shared/stores/emotion.store";
 import { emotionApi } from "@/src/shared/api/emotion.api";
 import { useState } from "react";
-import {
-  ParsedRecommendationData,
-} from "@/src/utils/parseRecommendation";
+import { ParsedRecommendationData } from "@/src/utils/parseRecommendation";
 
 interface MoodStepTwoProps {
   onNext: () => void;
@@ -267,10 +265,6 @@ export default function MoodStepTwo({
           )}
           rows={4}
         />
-        <p className="text-xs text-white/60">
-          {t("moodTracker.noteHint") ||
-            "Опишіть що призвело до цієї емоції або ваші думки"}
-        </p>
       </motion.div>
 
       {/* Loading Indicator */}
@@ -295,8 +289,7 @@ export default function MoodStepTwo({
         className="bg-white/5 rounded-lg p-3 backdrop-blur-sm border border-white/10"
       >
         <p className="text-xs text-white/70 text-center">
-          {t("moodTracker.step2Info") ||
-            "Крок 2 з 3: Визначення тригерів та додаткової інформації"}
+          {"Крок 2 з 3: Визначення тригерів та додаткової інформації"}
         </p>
       </motion.div>
 

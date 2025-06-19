@@ -3,7 +3,8 @@
     "dashboard": "Панель",
     "moodTracker": "Трекер настрою",
     "profile": "Профіль",
-    "doctors": "Лікарі"
+    "moodTrackerHistory": "Історія",
+    "breathingExercises": "Дихальні вправи"
   },
   "landing": {
     "hero": {
@@ -182,6 +183,7 @@
   },
   "dashboard": {
     "title": "Панель",
+    "history": "Історія",
     "welcome": "З поверненням, Сара! Ось огляд вашого ментального здоров'я.",
     "trackMood": "Відстежити настрій",
     "profile": "Профіль",
@@ -228,12 +230,17 @@
       "fridayAt": "П'ятниця, 10:00"
     }
   },
-  "moodTracker": {
+  "moodTracker": { 
+    "streak": { "total": "Загальна серія записів", "days": "Серія днів поспіль" },
+    "currentMood": "Поточна інформація",
+    "fetchingRecommendations": "Отримання рекомендацій...",
+    "selectedTriggers": "Обрані тригери",
     "title": "Як ви себе почуваєте?",
     "subtitle": "Оберіть ваш поточний емоційний стан",
     "showHistory": "Показати історію",
     "hideHistory": "Сховати історію",
     "recentEntries": "Останні записи настрою",
+    "emotionSaved": "Ваше почуття збережено!",
     "intensity": "Інтенсивність",
     "view": "Переглянути",
     "continue": "Продовжити",
@@ -382,59 +389,7 @@
     "deleteAccount": "Видалити обліковий запис",
     "logout": "Вийти"
   },
-  "doctors": {
-    "title": "Знайти лікаря",
-    "subtitle": "Зв'яжіться з фахівцями з ментального здоров'я",
-    "searchPlaceholder": "Шукати лікарів за ім'ям або спеціальністю...",
-    "filters": "Фільтри",
-    "all": "Всі",
-    "experience": "досвіду",
-    "next": "Наступний:",
-    "call": "Подзвонити",
-    "message": "Повідомлення",
-    "bookAppointment": "Записатися на прийом",
-    "noResults": "Лікарів не знайдено",
-    "tryAdjusting": "Спробуйте змінити пошук або фільтри",
-    "crisisSupport": "Кризова підтримка",
-    "crisisDesc": "Якщо ви переживаєте кризу ментального здоров'я, будь ласка, негайно зверніться за допомогою",
-    "crisisHotline": "Гаряча лінія кризи: 988",
-    "emergency": "Екстрена служба: 911",
-    "availableToday": "Доступний сьогодні",
-    "availableTomorrow": "Доступний завтра",
-    "availableThisWeek": "Доступний цього тижня",
-    "availableNextWeek": "Доступний наступного тижня",
-    "specialties": {
-      "anxiety": "Тривожність",
-      "depression": "Депресія",
-      "ptsd": "ПТСР",
-      "bipolar": "Біполярний розлад",
-      "adhd": "СДУГ",
-      "trauma": "Травма",
-      "cbt": "КПТ",
-      "dbt": "ДПТ",
-      "mindfulness": "Усвідомленість",
-      "couplesTherapy": "Парна терапія",
-      "familyTherapy": "Сімейна терапія"
-    },
-    "doctorsList": {
-      "drSarah": {
-        "name": "Др. Сара Сміт",
-        "specialty": "Клінічний психолог"
-      },
-      "drMichael": {
-        "name": "Др. Михайло Чен",
-        "specialty": "Психіатр"
-      },
-      "drEmily": {
-        "name": "Др. Емілі Родрігес",
-        "specialty": "Терапевт"
-      },
-      "drJames": {
-        "name": "Др. Джеймс Вілсон",
-        "specialty": "Поведінковий терапевт"
-      }
-    }
-  },
+
   "common": {
     "saveChanges": "Зберегти зміни",
     "loading": "Завантаження...",

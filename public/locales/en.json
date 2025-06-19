@@ -3,7 +3,8 @@
     "dashboard": "Dashboard",
     "moodTracker": "Mood Tracker",
     "profile": "Profile",
-    "doctors": "Doctors"
+    "moodTrackerHistory": "History",
+    "breathingExercises": "Breathing Exercises"
   },
   "landing": {
     "hero": {
@@ -182,6 +183,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "history": "Mood Tracker History",
     "welcome": "Welcome back, Sarah! Here's your mental health overview.",
     "trackMood": "Track Mood",
     "profile": "Profile",
@@ -229,6 +231,11 @@
     }
   },
   "moodTracker": {
+    "streak": { "total": "Total", "days": "days" },
+    "currentMood": "Current Mood",
+    "selectedTriggers": "Selected Trigger",
+    "fetchingRecommendations": "Fetching recommendations...",
+    "emotionSaved": "Your mood has been saved successfully!",
     "title": "How are you feeling?",
     "subtitle": "Select your current emotional state",
     "showHistory": "Show History",
@@ -390,59 +397,7 @@
     "deleteAccount": "Delete Account",
     "logout": "Log Out"
   },
-  "doctors": {
-    "title": "Find a Doctor",
-    "subtitle": "Connect with mental health professionals",
-    "searchPlaceholder": "Search doctors by name or specialty...",
-    "filters": "Filters",
-    "all": "All",
-    "experience": "experience",
-    "next": "Next:",
-    "call": "Call",
-    "message": "Message",
-    "bookAppointment": "Book Appointment",
-    "noResults": "No doctors found",
-    "tryAdjusting": "Try adjusting your search or filters",
-    "crisisSupport": "Crisis Support",
-    "crisisDesc": "If you're experiencing a mental health emergency, please reach out immediately",
-    "crisisHotline": "Crisis Hotline: 988",
-    "emergency": "Emergency: 911",
-    "availableToday": "Available Today",
-    "availableTomorrow": "Available Tomorrow",
-    "availableThisWeek": "Available This Week",
-    "availableNextWeek": "Available Next Week",
-    "specialties": {
-      "anxiety": "Anxiety",
-      "depression": "Depression",
-      "ptsd": "PTSD",
-      "bipolar": "Bipolar",
-      "adhd": "ADHD",
-      "trauma": "Trauma",
-      "cbt": "CBT",
-      "dbt": "DBT",
-      "mindfulness": "Mindfulness",
-      "couplesTherapy": "Couples Therapy",
-      "familyTherapy": "Family Therapy"
-    },
-    "doctorsList": {
-      "drSarah": {
-        "name": "Dr. Sarah Smith",
-        "specialty": "Clinical Psychologist"
-      },
-      "drMichael": {
-        "name": "Dr. Michael Chen",
-        "specialty": "Psychiatrist"
-      },
-      "drEmily": {
-        "name": "Dr. Emily Rodriguez",
-        "specialty": "Therapist"
-      },
-      "drJames": {
-        "name": "Dr. James Wilson",
-        "specialty": "Behavioral Therapist"
-      }
-    }
-  },
+
   "common": {
     "loading": "Loading...",
     "save": "Save",

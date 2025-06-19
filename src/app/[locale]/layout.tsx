@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { locales } from "@/lib/i18n";
+import { locales } from "@/src/lib/i18n";
 import { ThemeProvider } from "next-themes";
 import { DefaultLayout } from "@/src/components/DefaultLayout";
 

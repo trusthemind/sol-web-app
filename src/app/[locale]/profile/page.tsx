@@ -23,7 +23,7 @@ export default function Profile() {
   }, []);
 
   if (isLoading) {
-    return <LoadingSpinner loadingText={t("common.loading")} />;
+    return <LoadingSpinner />;
   }
 
   const progressStats = [

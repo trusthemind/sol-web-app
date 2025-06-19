@@ -7,7 +7,7 @@ enum AppRoutes {
   NOT_FOUND = "*",
   MOOD = "/mood",
   MOOD_HISTORY = "/mood/history",
-  DOCTORS = "/doctors",
+  BREATHING = "/breathing",
 }
 
 export { AppRoutes };

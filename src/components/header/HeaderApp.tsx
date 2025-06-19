@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   Brain,
   Menu,
@@ -13,6 +13,8 @@ import {
   Heart,
   Stethoscope,
   User,
+  Wind,
+  LogsIcon,
 } from "lucide-react";
 import { LanguageSwitcher } from "@/src/components/header/LanguageSwitcher";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
@@ -21,17 +23,7 @@ import { useAuth } from "../../shared/stores/context/AuthContext";
 import Image from "next/image";
 import { cn } from "@/src/lib/utils";
 import clsx from "clsx";
-
-// Constants and Types
-enum AppRoutes {
-  HOME = "/",
-  AUTH = "/auth",
-  DASHBOARD = "/dashboard",
-  PROFILE = "/profile",
-  NOT_FOUND = "*",
-  MOOD = "/mood",
-  DOCTORS = "/doctors",
-}
+import { AppRoutes } from "@/src/shared/constants/navigation";
 
 interface NavItem {
   route: AppRoutes;
@@ -67,9 +59,14 @@ const NAVIGATION_ITEMS: NavItem[] = [
     labelKey: "navigation.moodTracker",
   },
   {
-    route: AppRoutes.DOCTORS,
-    icon: Stethoscope,
-    labelKey: "navigation.doctors",
+    route: AppRoutes.MOOD_HISTORY,
+    icon: LogsIcon,
+    labelKey: "navigation.moodTrackerHistory",
+  },
+  {
+    route: AppRoutes.BREATHING,
+    icon: Wind,
+    labelKey: "navigation.breathingExercises",
   },
   {
     route: AppRoutes.PROFILE,

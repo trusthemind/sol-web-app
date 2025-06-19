@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/src/components/ui/dropdown-menu";
 import { Globe, Check, ChevronDown } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { locales, type Locale } from "@/lib/i18n";
+import { locales, type Locale } from "@/src/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 
 enum Languages {

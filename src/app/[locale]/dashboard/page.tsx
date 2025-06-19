@@ -11,34 +11,14 @@ import QuoteOfTheDay from "@/src/components/dashboard/QuoteOfTheDay";
 import DashboardStats from "@/src/components/dashboard/DashboardStats";
 import MoodTrendsChart from "@/src/components/dashboard/MoodTreadChart";
 import RecentEmotions from "@/src/components/dashboard/RecentEmotion";
+import { LoadingSpinner } from "@/src/components/LoadingSpinner";
 
 export default function Dashboard() {
   const { t, locale, isLoading } = useTranslation();
   const { user } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <motion.div
-            className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full mx-auto mb-6"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 1,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-          />
-          <motion.p
-            className="text-slate-600 font-medium text-lg"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-          >
-            {t("common.loading")}
-          </motion.p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

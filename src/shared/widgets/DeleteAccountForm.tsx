@@ -42,7 +42,7 @@ export const DeleteAccountModal = ({
   const { deleting, deleteAccount } = useAccountDeletion();
 
   useEffect(() => {
-    return () => toast.dismiss("delete-account");
+    return () => void toast.dismiss("delete-account");
   }, []);
 
   const {
@@ -53,7 +53,7 @@ export const DeleteAccountModal = ({
     reset,
     trigger: validateForm,
   } = useForm<DeleteAccountFormData>({
-    resolver: yupResolver(deleteAccountSchema),
+    resolver: yupResolver(deleteAccountSchema) as any,
     mode: "onChange",
   });
 

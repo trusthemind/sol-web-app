@@ -22,6 +22,12 @@ function getLocale(request: NextRequest): Locale {
 function isValidRoute(pathname: string): boolean {
   const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "/";
   const validPaths: AppRoutes[] | string[] = Object.values(AppRoutes);
+
+  // Check the clean path, not the original pathname
+  if (pathWithoutLocale === AppRoutes.ADMIN) {
+    return true;
+  }
+
   return validPaths.includes(pathWithoutLocale as AppRoutes);
 }
 
@@ -67,7 +73,8 @@ export function middleware(request: NextRequest) {
     ? pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "/"
     : pathname;
 
-  if (!isValidRoute(pathname)) {
+  // Use cleanPathname instead of pathname for route validation
+  if (!isValidRoute(cleanPathname)) {
     const authUrl = new URL(`/${locale}${AppRoutes.AUTH}`, request.url);
     return NextResponse.redirect(authUrl);
   }

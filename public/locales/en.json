@@ -4,7 +4,8 @@
     "moodTracker": "Mood Tracker",
     "profile": "Profile",
     "moodTrackerHistory": "History",
-    "breathingExercises": "Breathing Exercises"
+    "breathingExercises": "Breathing Exercises",
+    "admin": "Admin panel"
   },
   "landing": {
     "hero": {
@@ -415,5 +416,53 @@
     "confirm": "Confirm",
     "yes": "Yes",
     "no": "No"
+  },
+  "admin": {
+    "userManagement": {
+      "title": "User Management",
+      "description": "Manage and monitor all users in the system",
+      "totalUsers": "{{count}} Total Users",
+      "searchPlaceholder": "Search users by name or email...",
+      "allRoles": "All Roles",
+      "search": "Search",
+      "tryAgain": "Try again",
+      "noUsers": "No users found",
+      "table": {
+        "user": "User",
+        "email": "Email",
+        "role": "Role",
+        "healthId": "Health ID",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "actions": {
+        "view": "View Details",
+        "delete": "Delete User"
+      },
+      "pagination": {
+        "showing": "Showing {{from}} to {{to}} of {{total}} results",
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "deleteModal": {
+        "title": "Delete User",
+        "description": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleting": "Deleting..."
+      }
+    },
+    "roles": {
+      "admin": "Admin",
+      "patient": "Patient"
+    },
+    "errors": {
+      "unauthorized": "Unauthorized access. Please check your admin permissions and try logging in again.",
+      "forbidden": "Access forbidden. You do not have admin privileges to view this data.",
+      "fetchFailed": "Failed to fetch users",
+      "deleteUnauthorized": "Unauthorized access. Please check your admin permissions and try logging in again.",
+      "deleteForbidden": "Access forbidden. You do not have admin privileges to delete users.",
+      "deleteFailed": "Failed to delete user"
+    }
   }
 }

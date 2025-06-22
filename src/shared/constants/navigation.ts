@@ -8,6 +8,7 @@ enum AppRoutes {
   MOOD = "/mood",
   MOOD_HISTORY = "/mood/history",
   BREATHING = "/breathing",
+  ADMIN = '/admin-dashboard'
 }
 
 export { AppRoutes };

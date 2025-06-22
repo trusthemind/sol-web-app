@@ -22,6 +22,7 @@ export interface User {
   avatar?: string;
   firstName: string;
   lastName: string;
+  role: string;
 }
 
 export interface LoginData {
@@ -159,7 +160,6 @@ export function useAuth() {
   }
   return context;
 }
-
 
 export function withAuth<T extends object>(Component: React.ComponentType<T>) {
   return function AuthenticatedComponent(props: T) {

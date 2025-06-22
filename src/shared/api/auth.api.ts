@@ -17,6 +17,7 @@ type ResponseUserData = {
   firstName: string;
   lastName: string;
   avatar: string;
+  role: string;
 };
 
 export interface UserDataResponse {

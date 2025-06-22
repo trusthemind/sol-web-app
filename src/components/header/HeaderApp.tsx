@@ -15,6 +15,7 @@ import {
   User,
   Wind,
   LogsIcon,
+  Shield,
 } from "lucide-react";
 import { LanguageSwitcher } from "@/src/components/header/LanguageSwitcher";
 import { useTranslation } from "@/src/shared/hooks/useTranslation";
@@ -29,6 +30,7 @@ interface NavItem {
   route: AppRoutes;
   icon: React.ComponentType<{ className?: string }>;
   labelKey: string;
+  adminOnly?: boolean;
 }
 
 interface UserAvatarProps {
@@ -72,6 +74,12 @@ const NAVIGATION_ITEMS: NavItem[] = [
     route: AppRoutes.PROFILE,
     icon: User,
     labelKey: "navigation.profile",
+  },
+  {
+    route: AppRoutes.ADMIN,
+    icon: Shield,
+    labelKey: "navigation.admin",
+    adminOnly: true,
   },
 ];
 
@@ -171,21 +179,35 @@ const NavigationItem = ({
     ? "bg-gradient-to-r from-[#155DFC] to-blue-600 text-white shadow-lg shadow-blue-500/20"
     : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-600";
 
+  // Special styling for admin route
+  const adminClasses = item.adminOnly
+    ? "border border-orange-200 bg-gradient-to-r from-orange-50 to-red-50"
+    : "";
+
   if (isMobile) {
     return (
       <Link
         href={href}
-        className={`${baseClasses} space-x-3 px-6 py-3 rounded-xl hover:scale-[1.02] ${activeClasses}`}
+        className={`${baseClasses} space-x-3 px-6 py-3 rounded-xl hover:scale-[1.02] ${activeClasses} ${adminClasses}`}
         onClick={handleClick}
         aria-current={isActive ? "page" : undefined}
       >
         <Icon
           className={`h-5 w-5 transition-all duration-300 ${
-            isActive ? "text-white" : "text-gray-500"
+            isActive
+              ? "text-white"
+              : item.adminOnly
+              ? "text-orange-600"
+              : "text-gray-500"
           }`}
           aria-hidden="true"
         />
         <span className="font-medium">{t(item.labelKey)}</span>
+        {item.adminOnly && (
+          <span className="ml-auto text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-semibold">
+            ADMIN
+          </span>
+        )}
       </Link>
     );
   }
@@ -194,13 +216,17 @@ const NavigationItem = ({
     <Link
       href={href}
       onClick={handleClick}
-      className="relative px-6 py-3 rounded-full transition-all duration-300 group hover:scale-105"
+      className={`relative px-6 py-3 rounded-full transition-all duration-300 group hover:scale-105 ${adminClasses}`}
       aria-current={isActive ? "page" : undefined}
     >
       {isActive && (
         <motion.div
           layoutId="activeNavBg"
-          className="absolute inset-0 bg-gradient-to-r from-[#155DFC] to-blue-600 rounded-full shadow-lg shadow-blue-500/30"
+          className={`absolute inset-0 rounded-full shadow-lg ${
+            item.adminOnly
+              ? "bg-gradient-to-r from-orange-500 to-red-500 shadow-orange-500/30"
+              : "bg-gradient-to-r from-[#155DFC] to-blue-600 shadow-blue-500/30"
+          }`}
           transition={{ type: "spring", duration: 0.6, bounce: 0.2 }}
         />
       )}
@@ -209,17 +235,28 @@ const NavigationItem = ({
           className={`h-5 w-5 transition-all duration-300 ${
             isActive
               ? "text-white"
+              : item.adminOnly
+              ? "text-orange-600 group-hover:text-orange-700 group-hover:scale-110"
               : "text-gray-500 group-hover:text-[#155DFC] group-hover:scale-110"
           }`}
           aria-hidden="true"
         />
         <span
           className={`text-sm font-medium transition-all duration-300 ${
-            isActive ? "text-white" : "text-gray-600 group-hover:text-[#155DFC]"
+            isActive
+              ? "text-white"
+              : item.adminOnly
+              ? "text-orange-700 group-hover:text-orange-800"
+              : "text-gray-600 group-hover:text-[#155DFC]"
           }`}
         >
           {t(item.labelKey)}
         </span>
+        {item.adminOnly && !isActive && (
+          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-semibold">
+            ADMIN
+          </span>
+        )}
       </div>
     </Link>
   );
@@ -247,10 +284,18 @@ export const HeaderApp = () => {
     [user?.avatar, user?.lastName, user?.firstName]
   );
 
+  const visibleNavigationItems = useMemo(() => {
+    return NAVIGATION_ITEMS.filter((item) => {
+      if (item.adminOnly) return user?.role === "admin";
+
+      return true;
+    });
+  }, [user?.role]);
+
   const activeRoute = useMemo(() => {
     const cleanPath = pathname.replace(`/${locale}`, "") || "/";
 
-    const matchedItem = NAVIGATION_ITEMS.find((item) => {
+    const matchedItem = visibleNavigationItems.find((item) => {
       if (
         item.route === AppRoutes.DASHBOARD &&
         (cleanPath === "/" || cleanPath === "/dashboard")
@@ -261,7 +306,7 @@ export const HeaderApp = () => {
     });
 
     return matchedItem?.route || AppRoutes.DASHBOARD;
-  }, [pathname, locale]);
+  }, [pathname, locale, visibleNavigationItems]);
 
   // Optimized scroll handler with throttling
   useEffect(() => {
@@ -355,15 +400,15 @@ export const HeaderApp = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center flex-1 max-w-3xl mx-auto">
+          <div className="hidden lg:flex items-center justify-center flex-1 max-w-2xl mx-auto">
             <motion.div
-              className="flex items-center space-x-1 bg-gradient-to-r from-blue-50/80 to-blue-100/80 backdrop-blur-sm rounded-full p-2 shadow-lg shadow-blue-500/10 border border-blue-100/30"
+              className="flex items-center space-x-0.5 bg-gradient-to-r from-blue-50/80 to-blue-100/80 backdrop-blur-sm rounded-full p-1.5 shadow-lg shadow-blue-500/10 border border-blue-100/30"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
               role="menubar"
             >
-              {NAVIGATION_ITEMS.map((item) => (
+              {visibleNavigationItems.map((item) => (
                 <NavigationItem
                   key={item.route}
                   item={item}
@@ -374,7 +419,6 @@ export const HeaderApp = () => {
               ))}
             </motion.div>
           </div>
-
           {/* Right Side Controls */}
           <div className="flex items-center space-x-4 ml-auto">
             {/* Desktop Controls */}
@@ -455,7 +499,7 @@ export const HeaderApp = () => {
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.95 }}
               >
-                {NAVIGATION_ITEMS.map((item, index) => (
+                {visibleNavigationItems.map((item, index) => (
                   <motion.div
                     key={item.route}
                     custom={index}
@@ -476,7 +520,7 @@ export const HeaderApp = () => {
 
                 {/* Mobile Profile */}
                 <motion.div
-                  custom={NAVIGATION_ITEMS.length}
+                  custom={visibleNavigationItems.length}
                   variants={mobileItemVariants}
                   initial="hidden"
                   animate="visible"
@@ -499,6 +543,11 @@ export const HeaderApp = () => {
                       <div className="font-semibold text-gray-800">
                         {userInfo.firstName} {userInfo.lastName}
                       </div>
+                      {user?.role === "ADMIN" && (
+                        <div className="text-sm text-orange-600 font-medium">
+                          Administrator
+                        </div>
+                      )}
                     </div>
                   </Link>
                 </motion.div>

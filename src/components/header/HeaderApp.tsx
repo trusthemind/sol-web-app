@@ -295,20 +295,21 @@ export const HeaderApp = () => {
   const activeRoute = useMemo(() => {
     const cleanPath = pathname.replace(`/${locale}`, "") || "/";
 
-    const matchedItem = visibleNavigationItems.find((item) => {
-      if (
-        item.route === AppRoutes.DASHBOARD &&
-        (cleanPath === "/" || cleanPath === "/dashboard")
-      ) {
-        return true;
-      }
-      return cleanPath.includes(item.route) && item.route !== "/";
+    if (cleanPath === "/" || cleanPath === "/dashboard")
+      return AppRoutes.DASHBOARD;
+
+    const sortedItems = [...visibleNavigationItems].sort(
+      (a, b) => b.route.length - a.route.length
+    );
+
+    const matchedItem = sortedItems.find((item) => {
+      if (item.route === AppRoutes.DASHBOARD) return false;
+      return cleanPath.startsWith(item.route);
     });
 
     return matchedItem?.route || AppRoutes.DASHBOARD;
   }, [pathname, locale, visibleNavigationItems]);
 
-  // Optimized scroll handler with throttling
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -350,7 +351,7 @@ export const HeaderApp = () => {
   if (shouldHideNavigation) return null;
 
   const headerClasses = clsx(
-    `absoulte top-0 left-0 right-0 z-50 transition-all duration-500`,
+    `fixed top-0 left-0 right-0 z-50 transition-all duration-500`,
     scrolled
       ? "bg-white/95 backdrop-blur-xl shadow-xl shadow-blue-500/5 border-b border-blue-100/20"
       : "bg-white/90 backdrop-blur-md"

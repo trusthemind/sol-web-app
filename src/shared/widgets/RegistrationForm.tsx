@@ -283,18 +283,6 @@ export default function RegisterForm({ isLoading = false }: RegisterFormProps) {
           )}
         </AnimatePresence>
       </Button>
-
-      <Button
-        type="button"
-        variant="outline"
-        className={clsx(
-          "w-full h-12 bg-white/10 border-white/20 [&&]:text-white",
-          "hover:bg-white/20 [&&]:hover:border-white/20"
-        )}
-      >
-        <GoogleIcon />
-        Google
-      </Button>
     </motion.form>
   );
 }

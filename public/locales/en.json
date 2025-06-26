@@ -232,6 +232,7 @@
     }
   },
   "moodTracker": {
+    "loadingRecommendations": "Fetching recommendations",
     "streak": { "total": "Total", "days": "days" },
     "currentMood": "Current Mood",
     "selectedTriggers": "Selected Trigger",

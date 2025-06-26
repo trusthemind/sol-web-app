@@ -37,7 +37,7 @@ const getConfig = (): Config => {
 
   return {
     apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
-    timeout: 10000,
+    timeout: 30000,
     cookiePrefix: env === "production" ? "sol_auth" : `${env}_sol_auth`,
   };
 };

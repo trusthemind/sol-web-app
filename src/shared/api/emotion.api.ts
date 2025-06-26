@@ -265,7 +265,7 @@ export const emotionApi = {
 
   async getEmotionsByTimeRange(
     userId: string,
-    timeRange: "today" | "week" | "month" | "quarter" | "year", 
+    timeRange: "today" | "week" | "month" | "quarter" | "year",
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionsByTimeRangeResponse }> {
     const res = await api.get(
@@ -319,7 +319,7 @@ export const emotionApi = {
     opt?: AxiosRequestConfig
   ): Promise<{ data: EmotionAnalysisResponse }> {
     const res = await api.get(
-      `/emotions/user/${userId}/analysis?timeRange=${timeRange}`,
+      `/emotions/user/${userId}/analysis`,
       opt
     );
     return ParseResponse(res);
